@@ -14,6 +14,6 @@
 - Lastly, Run `python ./auth_system/manage.py runserver` to spin up server locally.
 
 
-#### Do not hesitate to reach out by creatung an issue if there is any problem.
+#### Do not hesitate to reach out by creating an issue if there is any problem.
 
 ### Happy Coding
