@@ -141,7 +141,7 @@ SIMPLE_JWT = {
 }
 
 # Logging Configuration
-logging.basicConfig(level=(logging.DEBUG, logging.INFO))
+logging.basicConfig(level=(logging.DEBUG))
 
 # Clear prev config
 LOGGING_CONFIG = None
@@ -166,7 +166,7 @@ logging.config.dictConfig({
     },
     'loggers': {
         '': {
-            'level': [LOGLEVEL, LOGLEVEL2],
+            'level': LOGLEVEL,
             'handlers': ['console',],
         },
     },
