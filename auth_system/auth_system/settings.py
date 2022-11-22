@@ -17,6 +17,13 @@ SECRET_KEY = str(os.getenv('SECRET_KEY', ''))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv('DEBUG', False))
 
+PROTOCOL = "http"
+DOMAIN = "localhost:3000"
+
+if not DEBUG:
+    PROTOCOL = "https"
+    DOMAIN = ""
+
 ALLOWED_HOSTS = []
 
 
@@ -31,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'djoser',
     'storages',
     'accounts'
 ]
@@ -123,7 +131,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -139,6 +147,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=60),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
 
 # Logging Configuration
 logging.basicConfig(level=(logging.DEBUG))
@@ -171,4 +180,9 @@ logging.config.dictConfig({
         },
     },
 })
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]
 
