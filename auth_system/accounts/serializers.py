@@ -49,7 +49,7 @@ class GathpayUserAccountRegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-            
+
         user = User.objects.create(
             username=validated_data['username'],
             email=validated_data['email'],
@@ -75,6 +75,30 @@ class GathpayUsersAccountSerializer(serializers.ModelSerializer):
             'email',
             'is_active',
             'date_joined')
+
+
+class GathpayUserAccountUpdateSerializer(serializers.Serializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'is_active',
+            'date_joined')
+
+    def update(self, instance, validated_data):
+
+        instance['username'] = validated_data['username'],
+        instance['email'] = validated_data['email'],
+        instance['first_name'] = validated_data['first_name'].capitalize(),
+        instance['last_name'] = validated_data['last_name'].capitalize()
+
+        instance.save()
+        return instance
 
 
 class UpdateUserAccountPasswordSerializer(serializers.ModelSerializer):

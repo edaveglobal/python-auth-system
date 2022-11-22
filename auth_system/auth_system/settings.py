@@ -163,7 +163,8 @@ logging.config.dictConfig({
     'disable_existing_loggers': False,
     'formatters': {
         'console': {
-            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s',
+            'format': '%(asctime)s %(levelname)s \
+            [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s',
         },
     },
     'handlers': {
@@ -175,7 +176,7 @@ logging.config.dictConfig({
     'loggers': {
         '': {
             'level': LOGLEVEL,
-            'handlers': ['console',],
+            'handlers': ['console',]
         },
     },
 })
@@ -184,4 +185,3 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000"
 ]
-

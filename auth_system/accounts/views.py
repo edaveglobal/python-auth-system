@@ -1,5 +1,3 @@
-
-from functools import partial
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,11 +6,12 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
     GathpayUsersAccountSerializer,
-    # UpdateUserPasswordSerializer
+    GathpayUserAccountUpdateSerializer,
+    UpdateUserAccountPasswordSerializer
 )
 from django.contrib.auth.models import User
 
-from accounts import serializers
+# from accounts import serializers
 
 
 class GathpayUsersAccount(APIView):
@@ -29,7 +28,6 @@ class GathpayUsersAccount(APIView):
                 {
                     "message": f"Gathpay user {data['first_name']} account is successfully registered.",
                     "statusCode": status.HTTP_201_CREATED})
-
         return Response(
             {
                 "message": f"User with first name {data['first_name']} failed to register.",
@@ -63,67 +61,132 @@ class GathpayUsersAccounts(APIView):
         })
 
 
-# class BlocboxUserView(APIView):
+class GathpayUserAccount(APIView):
 
-#     permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-#     def get(self, request, pk, *args, **kwargs):
+    def get(self, request, pk, *args, **kwargs):
 
-#         try:
-#             user = User.objects.get(id=pk)
-#         except Exception as err:
-#             print(err)
-#             return Response({
-#                 "message": f"Blocbox user account with id {pk} not found.",
-#                 "statusCode": status.HTTP_404_NOT_FOUND,
-#                 "error": str(err)
-#             })
+        try:
+            user = User.objects.get(id=pk)
+        except Exception as err:
+            print(err)
+            return Response({
+                "message": f"Gathpay user account with id {pk} not found.",
+                "statusCode": status.HTTP_404_NOT_FOUND,
+                "error": str(err)
+            })
 
-#         serializer = UserSerializer
+        serializer = GathpayUsersAccountSerializer
 
-#         if serializer.is_valid:
-#             data = serializer(user, many=False).data
-#             return Response({
-#                 "message": f"Blocbox user account {pk} found successfully.",
-#                 "statusCode": status.HTTP_200_OK,
-#                 "user": data
-#             })
-#         return Response({
-#             "message": serializer.errors,
-#             "statusCode": status.HTTP_409_CONFLICT
-#         })
+        if serializer.is_valid:
+            data = serializer(user, many=False).data
+            return Response({
+                "message": f"Gathpay user account {pk} found successfully.",
+                "statusCode": status.HTTP_200_OK,
+                "user": data
+            })
+        return Response({
+            "message": serializer.errors,
+            "statusCode": status.HTTP_409_CONFLICT
+        })
 
-#     def delete(self, request, pk, *args, **kwargs):
-#         try:
-#             user = User.objects.get(id=pk)
-#         except Exception as err:
-#             return Response({
-#                 "message": f"Blocbox user account with id {pk} not found.",
-#                 "statusCode": status.HTTP_404_NOT_FOUND,
-#                 "error": str(err)
-#             })
+    def put(self, request, pk, *args, **kwargs):
+        try:
+            user = User.objects.get(id=pk)
+        except Exception as err:
+            error = {
+                "message": f"Gathpay user account with id {pk} does not exist.",
+                "statusCode": status.HTTP_404_NOT_FOUND,
+                "error": str(err)}
+            return Response(error)
 
-#         user.delete()
-#         return Response({
-#             "message": f"Blocbox user account {pk} deleted successfully.",
-#             "statusCode": status.HTTP_200_OK
-#         })
+        incoming_data = request.data
+        serializer = GathpayUserAccountUpdateSerializer
+        serializer = serializer(instance=user, data=incoming_data)
+
+        if serializer.is_valid(raise_exception=True):
+
+            serializer.save()
+
+            response = {
+                "message": f"Gathpay user account with id {pk} is successfully updated.",
+                "statusCode": status.HTTP_200_OK,
+                "data": serializer.data}
+
+            return Response(response)
+
+        error = {
+            "message": f"Gathpay user account with id {pk} is not successfully updated.",
+            "statusCode": status.HTTP_400_BAD_REQUEST,
+            "error": serializer.errors}
+        return Response(error)
+
+    def patch(self, request, pk, *args, **kwargs):
+        try:
+            user = User.objects.get(id=pk)
+        except Exception as err:
+            error = {
+                "message": f"Gathpay user account with id {pk} does not exist.",
+                "statusCode": status.HTTP_404_NOT_FOUND,
+                "error": str(err)}
+            return Response(error)
+
+        incoming_data = request.data
+        serializer = GathpayUserAccountUpdateSerializer
+        serializer = serializer(
+            instance=user,
+            data=incoming_data,
+            partial=True)
+
+        if serializer.is_valid(raise_exception=True):
+
+            serializer.save()
+
+            response = {
+                "message": f"Gathpay user account with id {pk} is not successfully patched.",
+                "statusCode": status.HTTP_200_OK,
+                "data": serializer.data}
+
+            return Response(response)
+
+        error = {
+            "message": f"Gathpay user account with id {pk} is not successfully patched.",
+            "statusCode": status.HTTP_400_BAD_REQUEST,
+            "error": serializer.errors}
+        return Response(error)
+
+    def delete(self, request, pk, *args, **kwargs):
+        try:
+            user = User.objects.get(id=pk)
+        except Exception as err:
+            return Response({
+                "message": f"Gathpay user account with id {pk} not found.",
+                "statusCode": status.HTTP_404_NOT_FOUND,
+                "error": str(err)
+            })
+
+        user.delete()
+        return Response({
+            "message": f"Gathpay user account with id {pk} deleted successfully.",
+            "statusCode": status.HTTP_200_OK
+        })
 
 
-# class ChangeBlocboxUserPasswordView(APIView):
-#     permission_classes = [IsAuthenticated]
+class GathpayUserAccountChangePassword(APIView):
+    permission_classes = [IsAuthenticated]
 
-#     def put(self, request, *args, **kwargs):
-#         serializer = UpdateUserPasswordSerializer(
-#             data=request.data, instance=request.user)
+    def put(self, request, *args, **kwargs):
+        serializer = UpdateUserAccountPasswordSerializer(
+            data=request.data, instance=request.user)
 
-#         if serializer.is_valid(raise_exception=True):
-#             serializer.save()
-#             return Response({
-#                 "message": "Password updated successfully.",
-#                 "statuCode": status.HTTP_200_OK
-#             })
-#         return Response({
-#             "message": str(serializer.errors),
-#             "statuCode": status.HTTP_409_CONFLICT
-#         })
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({
+                "message": "Password updated successfully.",
+                "statuCode": status.HTTP_200_OK
+            })
+        return Response({
+            "message": str(serializer.errors),
+            "statuCode": status.HTTP_409_CONFLICT
+        })
