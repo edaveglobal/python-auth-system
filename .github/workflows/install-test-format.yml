@@ -60,7 +60,7 @@ jobs:
 
     - name: Auto format py codes
       run: |
-        autopep8 --in-place --aggressive --aggressive ./auth_system/*.py  ./auth_system/accounts/*.py
+        autopep8 --in-place --aggressive --aggressive ./*.py  ./accounts/*.py
         # flake8 ./auth_system --max-line-length=100
         # black ./auth_system --check
         # isort ./auth_system --check --profile black
