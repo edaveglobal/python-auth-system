@@ -1,0 +1,67 @@
+name: Install Dependecies, Run Pytest, and Format codes
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        working-directory: ./auth_system
+
+    env:
+      DJANGO_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+      DB_IGNORE_SSL: "true"
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: 12Facebook@6
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    strategy:
+      max-parallel: 16
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ../requirements.dev.txt
+
+    # - name: Run tests scripts
+    #   run: pytest
+
+    - name: Auto format py codes
+      run: |
+        autopep8 --in-place --aggressive --aggressive ./*.py  ./accounts/*.py
+        # flake8 ./auth_system --max-line-length=100
+        # black ./auth_system --check
+        # isort ./auth_system --check --profile black
+        

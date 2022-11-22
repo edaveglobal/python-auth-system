@@ -17,6 +17,13 @@ SECRET_KEY = str(os.getenv('SECRET_KEY', ''))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv('DEBUG', False))
 
+PROTOCOL = "http"
+DOMAIN = "localhost:3000"
+
+if not DEBUG:
+    PROTOCOL = "https"
+    DOMAIN = ""
+
 ALLOWED_HOSTS = []
 
 
@@ -123,7 +130,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -140,8 +147,9 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+
 # Logging Configuration
-logging.basicConfig(level=(logging.DEBUG, logging.INFO))
+logging.basicConfig(level=(logging.DEBUG))
 
 # Clear prev config
 LOGGING_CONFIG = None
@@ -155,7 +163,8 @@ logging.config.dictConfig({
     'disable_existing_loggers': False,
     'formatters': {
         'console': {
-            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s',
+            'format': '%(asctime)s %(levelname)s \
+            [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s',
         },
     },
     'handlers': {
@@ -166,9 +175,13 @@ logging.config.dictConfig({
     },
     'loggers': {
         '': {
-            'level': [LOGLEVEL, LOGLEVEL2],
-            'handlers': ['console',],
+            'level': LOGLEVEL,
+            'handlers': ['console',]
         },
     },
 })
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]

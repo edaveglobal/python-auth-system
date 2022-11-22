@@ -9,6 +9,7 @@ django-summernote
 django-utils-six
 djangorestframework
 djangorestframework-simplejwt
+django-rest-authemail
 django-storages
 flake8
 gunicorn
