@@ -55,8 +55,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r ../requirements.dev.txt
 
-    - name: Run tests scripts
-      run: pytest
+    # - name: Run tests scripts
+    #   run: pytest
 
     - name: Auto format py codes
       run: |
