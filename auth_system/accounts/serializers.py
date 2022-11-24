@@ -1,4 +1,5 @@
 from typing import Dict, Any
+from django.forms import ValidationError
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
@@ -78,6 +79,8 @@ class GathpayUsersAccountSerializer(serializers.ModelSerializer):
 
 
 class GathpayUserAccountUpdateSerializer(serializers.Serializer):
+   
+
 
     class Meta:
         model = User
@@ -90,12 +93,28 @@ class GathpayUserAccountUpdateSerializer(serializers.Serializer):
             'is_active',
             'date_joined')
 
-    def update(self, instance, validated_data):
+    def validate_email(self, value):
+        user = self.context['request'].user
+        if User.objects.exclude(pk=user.pk).filter(email=value).exists():
+            raise serializers.ValidationError({"email": "This email is already in use."})
+        return value
 
-        instance['username'] = validated_data['username'],
-        instance['email'] = validated_data['email'],
-        instance['first_name'] = validated_data['first_name'].capitalize(),
-        instance['last_name'] = validated_data['last_name'].capitalize()
+    def validate_username(self, value):
+        user = self.context['request'].user
+        if User.objects.exclude(pk=user.pk).filter(username=value).exists():
+            raise serializers.ValidationError({"username": "This username is already in use."})
+        return value
+
+    def update(self, instance, validated_data):
+        # user = self.context['request'].user
+
+        # if user.pk != instance.pk:
+        #     raise serializers.ValidationError({"authorize": "You do not have permission to update the user account."})
+    
+        instance.username = validated_data.pop('username'),
+        instance.email = validated_data.pop('email'),
+        instance.first_name = validated_data.pop('first_name').capitalize(),
+        instance.last_name = validated_data.pop('last_name').capitalize()
 
         instance.save()
         return instance
