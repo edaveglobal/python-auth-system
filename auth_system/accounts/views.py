@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
+from .helpers import send_account_otp
 
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
@@ -10,9 +12,6 @@ from .serializers import (
     UpdateUserAccountPasswordSerializer
 )
 from django.contrib.auth.models import User
-
-# from accounts import serializers
-
 
 class GathpayUsersAccount(APIView):
     permission_classes = []
@@ -23,10 +22,11 @@ class GathpayUsersAccount(APIView):
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-
+            # decision later
+            # send_account_otp(serializer.data['email'], request.user)
             return Response(
                 {
-                    "message": f"Gathpay user {data['first_name']} account is successfully registered.",
+                    "message": f"Gathpay user {data['first_name']} account is successfully registered. Kindly check your mail for otp.",
                     "statusCode": status.HTTP_201_CREATED})
         return Response(
             {
@@ -93,7 +93,7 @@ class GathpayUserAccount(APIView):
 
     def put(self, request, pk, *args, **kwargs):
         try:
-            user = User.objects.get(id=pk)
+            user = User.objects.get(pk=pk)
         except Exception as err:
             error = {
                 "message": f"Gathpay user account with id {pk} does not exist.",
@@ -101,9 +101,8 @@ class GathpayUserAccount(APIView):
                 "error": str(err)}
             return Response(error)
 
-        incoming_data = request.data
         serializer = GathpayUserAccountUpdateSerializer
-        serializer = serializer(instance=user, data=incoming_data)
+        serializer = serializer(instance=request.user, data=request.data)
 
         if serializer.is_valid(raise_exception=True):
 
@@ -172,6 +171,12 @@ class GathpayUserAccount(APIView):
             "statusCode": status.HTTP_200_OK
         })
 
+
+class UpdateProfileView(generics.UpdateAPIView):
+
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated,)
+    serializer_class = GathpayUserAccountUpdateSerializer
 
 class GathpayUserAccountChangePassword(APIView):
     permission_classes = [IsAuthenticated]
