@@ -14,4 +14,4 @@ def send_account_otp(email , user, subject):
     except Exception as e:
         logging.warning(e)
         return
-    return True
+    return otp

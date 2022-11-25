@@ -17,12 +17,12 @@ from .thread import *
 
 class ForgetPassword(models.Model):
     user = models.ForeignKey(User , on_delete=models.CASCADE)
-    forget_password_token = models.CharField(max_length=250 ,null=True, blank=True)
+    forget_password_otp = models.CharField(max_length=10 ,null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return self.user
+        return self.user.username
 
 
 @receiver(post_save, sender=User)
