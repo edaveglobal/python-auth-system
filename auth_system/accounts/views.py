@@ -11,12 +11,13 @@ from .models import ForgetPassword
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
     GathpayUsersAccountSerializer,
-    # GathpayUserAccountUpdateSerializer,
+    ForgetPasswordAccountSerializer,
     UpdateUserAccountPasswordSerializer
 )
 from django.contrib.auth.models import User
 
 class GathpayUsersAccount(APIView):
+    """ Authorized Specific Users Account View"""
     permission_classes = []
 
     def post(self, request, *args, **kwargs):
@@ -38,6 +39,7 @@ class GathpayUsersAccount(APIView):
 
 
 class GathpayUsersAccounts(APIView):
+    """ Authorized Specific Users Accounts View"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -66,11 +68,11 @@ class GathpayUsersAccounts(APIView):
 
 
 class GathpayUserAccount(APIView):
-
+    """ Authorized Specific User Account View"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk, *args, **kwargs):
-
+        """ Specific User Account Fetch """
         try:
             user = User.objects.get(id=pk)
         except Exception as err:
@@ -96,7 +98,7 @@ class GathpayUserAccount(APIView):
         })
 
     def put(self, request, pk, *args, **kwargs):
-        
+        """ User Account Details Update """
         try:
             user = User.objects.get(pk=pk)
         except Exception as err:
@@ -130,6 +132,7 @@ class GathpayUserAccount(APIView):
         return Response(error)
 
     def patch(self, request, pk, *args, **kwargs):
+        """ User Account Details Patch"""
         try:
             user = User.objects.get(id=pk)
         except Exception as err:
@@ -182,7 +185,8 @@ class GathpayUserAccount(APIView):
             "statusCode": status.HTTP_200_OK
         })
 
-class GathpayUserAccountChangePassword(APIView):
+class GathpayUserChangePassword(APIView):
+    """ This view is actually for an active/logged in user account."""
     permission_classes = [IsAuthenticated]
 
     def put(self, request, *args, **kwargs):
@@ -202,6 +206,7 @@ class GathpayUserAccountChangePassword(APIView):
 
 
 class GathpayUserForgotPassword(APIView):
+    """ Unathorized User Forgot Password View """
 
     def post(self, request, *args, **kwargs): 
 
@@ -236,4 +241,32 @@ class GathpayUserResetPassword(APIView):
 
     def post(self, request, *args, **kwargs):
         
-        pass
+        try:
+            forget_password_user = ForgetPassword.objects.get(forget_password_otp=request.data['otp'])
+        except Exception as err:
+            logging.warning(err)
+            return Response({
+                "message": f"Gathpay user account with the one-time-password not found.",
+                "statusCode": status.HTTP_404_NOT_FOUND,
+                "error": str(err)
+            })
+        
+        serializer = ForgetPasswordAccountSerializer
+        serializer = serializer(instance=forget_password_user.user, data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            forget_password_user.forget_password_otp = 0
+            forget_password_user.save()
+            return Response({
+                "message": "Success. Your password has been updated.",
+                "statuCode": status.HTTP_202_ACCEPTED
+            })
+        logging.warning(serializer.errors)
+        return Response({
+            "message": "Failed operation.",
+            "statusCode": status.HTTP_404_NOT_FOUND,
+            "error": str(serializer.errors)
+        })
+
+        
