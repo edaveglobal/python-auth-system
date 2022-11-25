@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import generics
+import logging
 from .helpers import send_account_otp
 
 from .serializers import (
@@ -42,6 +42,7 @@ class GathpayUsersAccounts(APIView):
         try:
             users = User.objects.all().order_by('id')
         except Exception as err:
+            logging.warning(err)
             return Response({
                 "message": "Internal server error. Unable to fetch users' accounts.",
                 "statusCode": status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -71,7 +72,7 @@ class GathpayUserAccount(APIView):
         try:
             user = User.objects.get(id=pk)
         except Exception as err:
-            
+            logging.warning(err)
             return Response({
                 "message": f"Gathpay user account with id {pk} not found.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
@@ -97,6 +98,7 @@ class GathpayUserAccount(APIView):
         try:
             user = User.objects.get(pk=pk)
         except Exception as err:
+            logging.warning(err)
             error = {
                 "message": f"Gathpay user account with id {pk} does not exist.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
@@ -129,6 +131,7 @@ class GathpayUserAccount(APIView):
         try:
             user = User.objects.get(id=pk)
         except Exception as err:
+            logging.warning(err)
             error = {
                 "message": f"Gathpay user account with id {pk} does not exist.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
@@ -164,6 +167,7 @@ class GathpayUserAccount(APIView):
         try:
             user = User.objects.get(id=pk)
         except Exception as err:
+            logging.warning(err)
             return Response({
                 "message": f"Gathpay user account with id {pk} not found.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
@@ -175,13 +179,6 @@ class GathpayUserAccount(APIView):
             "message": f"Gathpay user account with id {pk} deleted successfully.",
             "statusCode": status.HTTP_200_OK
         })
-
-
-# class UpdateProfileView(generics.UpdateAPIView):
-
-#     queryset = User.objects.all()
-#     permission_classes = (IsAuthenticated,)
-#     serializer_class = GathpayUserAccountUpdateSerializer
 
 class GathpayUserAccountChangePassword(APIView):
     permission_classes = [IsAuthenticated]
@@ -200,3 +197,34 @@ class GathpayUserAccountChangePassword(APIView):
             "message": str(serializer.errors),
             "statuCode": status.HTTP_409_CONFLICT
         })
+
+
+class GathpayUserForgotPassword(APIView):
+
+    def post(self, request, *args, **kwargs): 
+
+        try:
+            email = User.objects.get(email=request.data['email'])
+        except Exception as err:
+            logging.warning(err)
+            return Response({
+                "message": f"Gathpay user account with email {request.data['email']} not found.",
+                "statusCode": status.HTTP_404_NOT_FOUND,
+                "error": str(err)
+            })
+        subject = "noreply: Your otp required to change password."
+        is_success = send_account_otp(email=email, user=request.user, subject=subject)
+
+        if is_success:
+            return Response({
+            "message": "Success. Check your email for otp.",
+            "statuCode": status.HTTP_200_OK
+        })
+
+        return Response({
+            "message": "Failed to send otp.",
+            "statuCode": status.HTTP_503_SERVICE_UNAVAILABLE
+        })
+
+
+
