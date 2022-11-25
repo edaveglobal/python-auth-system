@@ -15,10 +15,10 @@ urlpatterns = [
         'users/account/<int:pk>/',
         views.GathpayUserAccount.as_view(),
         name="useraccount"),
-    path(
-        'update_profile/<int:pk>/', views.UpdateProfileView.as_view(),
-        name='update'
-    ),
+    # path(
+    #     'update_profile/<int:pk>/', views.UpdateProfileView.as_view(),
+    #     name='update'
+    # ),
     # path('users/account/verify_email', views.GathpayUserAccountVerify.as_view(), name="verify"),
     path(
         'users/account/active/change-password',

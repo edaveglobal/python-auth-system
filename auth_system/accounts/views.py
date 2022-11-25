@@ -1,3 +1,4 @@
+import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,7 +9,7 @@ from .helpers import send_account_otp
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
     GathpayUsersAccountSerializer,
-    GathpayUserAccountUpdateSerializer,
+    # GathpayUserAccountUpdateSerializer,
     UpdateUserAccountPasswordSerializer
 )
 from django.contrib.auth.models import User
@@ -70,7 +71,7 @@ class GathpayUserAccount(APIView):
         try:
             user = User.objects.get(id=pk)
         except Exception as err:
-            print(err)
+            
             return Response({
                 "message": f"Gathpay user account with id {pk} not found.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
@@ -92,6 +93,7 @@ class GathpayUserAccount(APIView):
         })
 
     def put(self, request, pk, *args, **kwargs):
+        
         try:
             user = User.objects.get(pk=pk)
         except Exception as err:
@@ -101,8 +103,8 @@ class GathpayUserAccount(APIView):
                 "error": str(err)}
             return Response(error)
 
-        serializer = GathpayUserAccountUpdateSerializer
-        serializer = serializer(instance=request.user, data=request.data)
+        serializer = GathpayUsersAccountSerializer
+        serializer = serializer(instance=user, data=request.data, context={'request': request})
 
         if serializer.is_valid(raise_exception=True):
 
@@ -111,14 +113,16 @@ class GathpayUserAccount(APIView):
             response = {
                 "message": f"Gathpay user account with id {pk} is successfully updated.",
                 "statusCode": status.HTTP_200_OK,
-                "data": serializer.data}
+                "data": serializer.data
+                }
 
             return Response(response)
 
         error = {
             "message": f"Gathpay user account with id {pk} is not successfully updated.",
             "statusCode": status.HTTP_400_BAD_REQUEST,
-            "error": serializer.errors}
+            "error": serializer.errors
+            }
         return Response(error)
 
     def patch(self, request, pk, *args, **kwargs):
@@ -131,11 +135,11 @@ class GathpayUserAccount(APIView):
                 "error": str(err)}
             return Response(error)
 
-        incoming_data = request.data
-        serializer = GathpayUserAccountUpdateSerializer
+        serializer = GathpayUsersAccountSerializer
         serializer = serializer(
             instance=user,
-            data=incoming_data,
+            data=request.data,
+            context={'request': request},
             partial=True)
 
         if serializer.is_valid(raise_exception=True):
@@ -145,7 +149,8 @@ class GathpayUserAccount(APIView):
             response = {
                 "message": f"Gathpay user account with id {pk} is not successfully patched.",
                 "statusCode": status.HTTP_200_OK,
-                "data": serializer.data}
+                "data": serializer.data
+                }
 
             return Response(response)
 
@@ -172,11 +177,11 @@ class GathpayUserAccount(APIView):
         })
 
 
-class UpdateProfileView(generics.UpdateAPIView):
+# class UpdateProfileView(generics.UpdateAPIView):
 
-    queryset = User.objects.all()
-    permission_classes = (IsAuthenticated,)
-    serializer_class = GathpayUserAccountUpdateSerializer
+#     queryset = User.objects.all()
+#     permission_classes = (IsAuthenticated,)
+#     serializer_class = GathpayUserAccountUpdateSerializer
 
 class GathpayUserAccountChangePassword(APIView):
     permission_classes = [IsAuthenticated]
