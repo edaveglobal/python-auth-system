@@ -134,3 +134,23 @@ class UpdateUserAccountPasswordSerializer(serializers.ModelSerializer):
         instance.set_password(validated_data['new_password'])
         instance.save()
         return instance
+
+
+class ForgetPasswordAccountSerializer(serializers.ModelSerializer):
+
+    new_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password])
+
+    class Meta:
+        model = User
+        fields = ('new_password',)
+    
+    
+
+    
+    def update(self, instance, validated_data: Dict[str, Any]) -> User:
+        instance.set_password(validated_data['new_password'])
+        instance.save()
+        return instance

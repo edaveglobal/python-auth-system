@@ -16,13 +16,17 @@ urlpatterns = [
         views.GathpayUserAccount.as_view(),
         name="useraccount"),
     path(
-        'users/account/forgot_password', views.GathpayUserForgotPassword.as_view(),
+        'users/account/forgot_password', 
+        views.GathpayUserForgotPassword.as_view(),
         name='forgot_password'
     ),
-    #path('users/account/reset_password', views.GathpayUserResetPassword.as_view(), name="reset_password"),
+    path(
+        'users/account/reset_password', 
+        views.GathpayUserResetPassword.as_view(), 
+        name="reset_password"),
     path(
         'users/account/active/change_password',
-        views.GathpayUserAccountChangePassword.as_view(),
+        views.GathpayUserChangePassword.as_view(),
         name="change-password")
 ]
     
