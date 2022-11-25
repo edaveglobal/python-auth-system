@@ -12,5 +12,6 @@ def send_account_otp(email , user, subject):
     try:
         send_mail(subject, message, email_from, recipient_list)
     except Exception as e:
-        logging.debug(e)
+        logging.warning(e)
+        return
     return True
