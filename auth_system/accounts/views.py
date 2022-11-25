@@ -1,10 +1,12 @@
-import json
+
+import logging
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-import logging
+
 from .helpers import send_account_otp
+from .models import ForgetPassword
 
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
@@ -204,7 +206,8 @@ class GathpayUserForgotPassword(APIView):
     def post(self, request, *args, **kwargs): 
 
         try:
-            email = User.objects.get(email=request.data['email'])
+            user = User.objects.get(email=request.data['email'])
+            
         except Exception as err:
             logging.warning(err)
             return Response({
@@ -212,19 +215,25 @@ class GathpayUserForgotPassword(APIView):
                 "statusCode": status.HTTP_404_NOT_FOUND,
                 "error": str(err)
             })
-        subject = "noreply: Your otp required to change password."
-        is_success = send_account_otp(email=email, user=request.user, subject=subject)
-
-        if is_success:
+        try:
+            subject = "noreply: Your otp required to change password."
+            otp = send_account_otp(email=user.email, user=user, subject=subject)
+            forget_password_user = ForgetPassword.objects.get(user=user.id)
+            forget_password_user.forget_password_otp = otp
+            forget_password_user.save()
             return Response({
             "message": "Success. Check your email for otp.",
             "statuCode": status.HTTP_200_OK
-        })
-
-        return Response({
+             })
+        except Exception as e:
+            return Response({
             "message": "Failed to send otp.",
             "statuCode": status.HTTP_503_SERVICE_UNAVAILABLE
         })
+            
 
+class GathpayUserResetPassword(APIView):
 
-
+    def post(self, request, *args, **kwargs):
+        
+        pass
