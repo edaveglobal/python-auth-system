@@ -162,8 +162,7 @@ logging.basicConfig(level=(logging.DEBUG))
 LOGGING_CONFIG = None
 
 # Get loglevel from env
-LOGLEVEL = os.getenv('DJANGO_LOGLEVEL').upper()
-LOGLEVEL2 = os.getenv('DJANGO_LOGLEVEL2').upper()
+LOGLEVEL = os.getenv('DJANGO_LOGLEVEL', 'info').upper()
 
 logging.config.dictConfig({
     'version': 1,
