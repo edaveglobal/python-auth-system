@@ -10,6 +10,7 @@ django-utils-six
 djangorestframework
 djangorestframework-simplejwt
 django-rest-authemail
+django-sendgrid-v5
 django-storages
 flake8
 gunicorn

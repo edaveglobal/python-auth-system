@@ -74,7 +74,7 @@ class GathpayUserAccount(APIView):
     def get(self, request, pk, *args, **kwargs):
         """ Specific User Account Fetch """
         try:
-            user = User.objects.get(id=pk)
+            user = User.objects.filter(id=pk).first()
         except Exception as err:
             logging.warning(err)
             return Response({
@@ -100,7 +100,7 @@ class GathpayUserAccount(APIView):
     def put(self, request, pk, *args, **kwargs):
         """ User Account Details Update """
         try:
-            user = User.objects.get(pk=pk)
+            user = User.objects.filter(id=pk).first()
         except Exception as err:
             logging.warning(err)
             error = {
@@ -134,7 +134,7 @@ class GathpayUserAccount(APIView):
     def patch(self, request, pk, *args, **kwargs):
         """ User Account Details Patch"""
         try:
-            user = User.objects.get(id=pk)
+            user = User.objects.filter(id=pk).first()
         except Exception as err:
             logging.warning(err)
             error = {
@@ -170,7 +170,7 @@ class GathpayUserAccount(APIView):
 
     def delete(self, request, pk, *args, **kwargs):
         try:
-            user = User.objects.get(id=pk)
+            user = User.objects.filter(id=pk).first()
         except Exception as err:
             logging.warning(err)
             return Response({
