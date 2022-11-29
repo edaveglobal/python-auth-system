@@ -11,7 +11,7 @@ load_dotenv()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY DEBUG: keep the secret key used in production secret!
 SECRET_KEY = str(os.getenv('SECRET_KEY', ''))
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -156,7 +156,7 @@ SIMPLE_JWT = {
 
 
 # Logging Configuration
-logging.basicConfig(level=(logging.warning))
+logging.basicConfig(level=(logging.DEBUG))
 
 # Clear prev config
 LOGGING_CONFIG = None
