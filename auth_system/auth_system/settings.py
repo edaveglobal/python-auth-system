@@ -156,7 +156,7 @@ SIMPLE_JWT = {
 
 
 # Logging Configuration
-logging.basicConfig(level=(logging.DEBUG))
+logging.basicConfig(level=(logging.warning))
 
 # Clear prev config
 LOGGING_CONFIG = None
@@ -192,10 +192,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000"
 ]
 
-# EMAIL_BACKEND = os.getenv('EMAIL_BACKEND') 
-# EMAIL_HOST = os.getenv('EMAIL_HOST')
-# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-# EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
-# EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
-# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-# EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT'))
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', '') 
+EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 0))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', False)
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', 60))
