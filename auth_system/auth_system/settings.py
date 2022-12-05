@@ -192,10 +192,15 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000"
 ]
 
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', '') 
-EMAIL_HOST = os.getenv('EMAIL_HOST', '')
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', 0))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', False)
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', 60))
+EMAIL_HOST = 'smtp.mailtrap.io'
+EMAIL_HOST_USER = 'e9deba606668ea'
+EMAIL_HOST_PASSWORD = 'a2709506910bc5'
+EMAIL_PORT = '2525'
+
+# EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', '') 
+# EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+# EMAIL_PORT = str(os.getenv('EMAIL_PORT', ''))
+# EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', False)
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+# EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', 60))

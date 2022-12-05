@@ -40,6 +40,9 @@ class GathpayUserAccountRegisterSerializer(serializers.ModelSerializer):
             'last_name': {'required': True}
 
         }
+    
+    # def get_latest_by(self, obj):
+    #     return User.objects.all().latest()
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:

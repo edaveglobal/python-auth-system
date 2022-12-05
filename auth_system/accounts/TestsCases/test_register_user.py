@@ -1,14 +1,19 @@
 from rest_framework import status
-from django.test import TestCase
+from django.test import TestCase, Client
+from django.urls import reverse
 from .configs import Configs
 from django.contrib.auth.models import User
+
+from accounts.serializers import *
 
 
 class UserRegisterWithEmailTest(TestCase):
     config = Configs()
 
+    client = Client()
+
     def setUp(self) -> None:
-        User.objects.create_user(
+        self.test_user = User.objects.create_user(
             **self.config.user_register_data
         )
     
@@ -18,9 +23,11 @@ class UserRegisterWithEmailTest(TestCase):
     #     self.assertEqual(len(response), 2)
 
     def test_user_create(self):
-        test_user = User.objects.filter(email=self.config.user_register_data['email']).first()
-        print(test_user.username)
-        self.assertEqual(test_user.username, self.config.user_register_data['username'])
+        response = self.client.get('http://localhost:8000/api/v1/users/account/<int: pk>/', kwargs={"pk": self.test_user.pk}, format="json")
+        test_user = User.objects.get(pk=self.test_user.pk)
+        serializer = GathpayUsersAccountSerializer(data=test_user, many=False).is_valid()
+        print(response, serializer)
+        #self.assertEqual(response.statusCode, )
         #self.assertContains(status_code=status.HTTP_201_CREATED)
 
 
