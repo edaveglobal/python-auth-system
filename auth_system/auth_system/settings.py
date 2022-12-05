@@ -11,7 +11,7 @@ load_dotenv()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY DEBUG: keep the secret key used in production secret!
 SECRET_KEY = str(os.getenv('SECRET_KEY', ''))
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
     'storages',
     'accounts'
 ]
@@ -139,6 +141,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': [],
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination'
 }
 
@@ -158,8 +162,7 @@ logging.basicConfig(level=(logging.DEBUG))
 LOGGING_CONFIG = None
 
 # Get loglevel from env
-LOGLEVEL = os.getenv('DJANGO_LOGLEVEL').upper()
-LOGLEVEL2 = os.getenv('DJANGO_LOGLEVEL2').upper()
+LOGLEVEL = os.getenv('DJANGO_LOGLEVEL', 'info').upper()
 
 logging.config.dictConfig({
     'version': 1,
@@ -189,10 +192,15 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000"
 ]
 
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND') 
-EMAIL_HOST = os.getenv('EMAIL_HOST')
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT'))
+EMAIL_HOST = 'smtp.mailtrap.io'
+EMAIL_HOST_USER = 'e9deba606668ea'
+EMAIL_HOST_PASSWORD = 'a2709506910bc5'
+EMAIL_PORT = '2525'
+
+# EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', '') 
+# EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+# EMAIL_PORT = str(os.getenv('EMAIL_PORT', ''))
+# EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', False)
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+# EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', 60))

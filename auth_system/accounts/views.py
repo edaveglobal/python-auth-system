@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .helpers import send_account_otp
-from .models import ForgetPassword
+from .models import UserOTP
 
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
@@ -26,8 +26,6 @@ class GathpayUsersAccount(APIView):
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            # decision later
-            # send_account_otp(serializer.data['email'], request.user)
             return Response(
                 {
                     "message": f"Gathpay user {data['first_name']} account is successfully registered. Kindly check your mail for otp.",
@@ -69,7 +67,7 @@ class GathpayUsersAccounts(APIView):
 
 class GathpayUserAccount(APIView):
     """ Authorized Specific User Account View"""
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
 
     def get(self, request, pk, *args, **kwargs):
         """ Specific User Account Fetch """
@@ -221,11 +219,11 @@ class GathpayUserForgotPassword(APIView):
                 "error": str(err)
             })
         try:
-            subject = "noreply: Your otp required to change password."
+            subject = "noreply: OTP required to update your password."
             otp = send_account_otp(email=user.email, user=user, subject=subject)
-            forget_password_user = ForgetPassword.objects.get(user=user.id)
-            forget_password_user.forget_password_otp = otp
-            forget_password_user.save()
+            user_otp_obj = UserOTP.objects.get(user=user.id)
+            user_otp_obj.user_otp = otp
+            user_otp_obj.save()
             return Response({
             "message": "Success. Check your email for otp.",
             "statuCode": status.HTTP_200_OK
@@ -242,7 +240,7 @@ class GathpayUserResetPassword(APIView):
     def post(self, request, *args, **kwargs):
         
         try:
-            forget_password_user = ForgetPassword.objects.get(forget_password_otp=request.data['otp'])
+            user_otp_obj = UserOTP.objects.get(user_otp=request.data['otp'])
         except Exception as err:
             logging.warning(err)
             return Response({
@@ -252,12 +250,12 @@ class GathpayUserResetPassword(APIView):
             })
         
         serializer = ForgetPasswordAccountSerializer
-        serializer = serializer(instance=forget_password_user.user, data=request.data)
+        serializer = serializer(instance=user_otp_obj.user, data=request.data)
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            forget_password_user.forget_password_otp = 0
-            forget_password_user.save()
+            user_otp_obj.user_otp = ""
+            user_otp_obj.save()
             return Response({
                 "message": "Success. Your password has been updated.",
                 "statuCode": status.HTTP_202_ACCEPTED
@@ -269,4 +267,24 @@ class GathpayUserResetPassword(APIView):
             "error": str(serializer.errors)
         })
 
-        
+
+
+class GathpayUserAccountActivate(APIView):
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        OTP = request.data['otp']
+        try:
+            user_otp_obj = UserOTP.objects.get(user_otp=OTP)
+        except Exception as e:
+            logging.warning(e)
+            return Response({
+                "message": f"User account with OTP {request.data['otp']} not found.",
+                "statusCode": status.HTTP_404_NOT_FOUND
+            })
+        user_otp_obj.user_otp = "OTP used"
+        user_otp_obj.save()
+        return Response({
+            "message": "Account activated successfully.",
+            "statuCode": status.HTTP_200_OK
+            })

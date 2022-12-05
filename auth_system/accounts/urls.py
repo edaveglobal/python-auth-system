@@ -14,7 +14,7 @@ urlpatterns = [
     path(
         'users/account/<int:pk>/',
         views.GathpayUserAccount.as_view(),
-        name="useraccount"),
+        name="get_update_delete_useraccount"),
     path(
         'users/account/forgot_password', 
         views.GathpayUserForgotPassword.as_view(),
@@ -27,6 +27,13 @@ urlpatterns = [
     path(
         'users/account/active/change_password',
         views.GathpayUserChangePassword.as_view(),
-        name="change-password")
+        name="change-password"),
+
+    path(
+        'users/account/activate', 
+        views.GathpayUserAccountActivate.as_view(),
+        name="activate-account"
+    )
+    
 ]
     
