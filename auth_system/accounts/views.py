@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .helpers import send_account_otp
 from .models import UserOTP
+from .thread import SendAccountActivationEmail
 
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
@@ -28,7 +29,7 @@ class GathpayUsersAccount(APIView):
             serializer.save()
             return Response(
                 {
-                    "message": f"Gathpay user {data['first_name']} account is successfully registered. Kindly check your mail for otp.",
+                    "message": f"Gathpay user {data['first_name']} account is successfully registered. Kindly check your mail for OTP.",
                     "statusCode": status.HTTP_201_CREATED})
         return Response(
             {
@@ -44,7 +45,7 @@ class GathpayUsersAccounts(APIView):
         try:
             users = User.objects.all().order_by('id')
         except Exception as err:
-            logging.warning(err)
+            logging.debug(err)
             return Response({
                 "message": "Internal server error. Unable to fetch users' accounts.",
                 "statusCode": status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -67,14 +68,14 @@ class GathpayUsersAccounts(APIView):
 
 class GathpayUserAccount(APIView):
     """ Authorized Specific User Account View"""
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk, *args, **kwargs):
         """ Specific User Account Fetch """
         try:
             user = User.objects.filter(id=pk).first()
         except Exception as err:
-            logging.warning(err)
+            logging.debug(err)
             return Response({
                 "message": f"Gathpay user account with id {pk} not found.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
@@ -183,6 +184,8 @@ class GathpayUserAccount(APIView):
             "statusCode": status.HTTP_200_OK
         })
 
+
+
 class GathpayUserChangePassword(APIView):
     """ This view is actually for an active/logged in user account."""
     permission_classes = [IsAuthenticated]
@@ -206,13 +209,15 @@ class GathpayUserChangePassword(APIView):
 class GathpayUserForgotPassword(APIView):
     """ Unathorized User Forgot Password View """
 
+    permission_classes = []
+
     def post(self, request, *args, **kwargs): 
 
         try:
             user = User.objects.get(email=request.data['email'])
             
         except Exception as err:
-            logging.warning(err)
+            logging.debug(err)
             return Response({
                 "message": f"Gathpay user account with email {request.data['email']} not found.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
@@ -242,7 +247,7 @@ class GathpayUserResetPassword(APIView):
         try:
             user_otp_obj = UserOTP.objects.get(user_otp=request.data['otp'])
         except Exception as err:
-            logging.warning(err)
+            logging.debug(err)
             return Response({
                 "message": f"Gathpay user account with the one-time-password not found.",
                 "statusCode": status.HTTP_404_NOT_FOUND,
@@ -254,7 +259,7 @@ class GathpayUserResetPassword(APIView):
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            user_otp_obj.user_otp = ""
+            user_otp_obj.user_otp = "OTP consumed"
             user_otp_obj.save()
             return Response({
                 "message": "Success. Your password has been updated.",
@@ -277,14 +282,14 @@ class GathpayUserAccountActivate(APIView):
         try:
             user_otp_obj = UserOTP.objects.get(user_otp=OTP)
         except Exception as e:
-            logging.warning(e)
+            logging.debug(e)
             return Response({
                 "message": f"User account with OTP {request.data['otp']} not found.",
                 "statusCode": status.HTTP_404_NOT_FOUND
             })
-        user_otp_obj.user_otp = "OTP used"
+        user_otp_obj.user_otp = "OTP already used"
         user_otp_obj.save()
         return Response({
-            "message": "Account activated successfully.",
+            "message": "User email verified successfully.",
             "statuCode": status.HTTP_200_OK
             })

@@ -1,11 +1,11 @@
-
+import logging
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import time
-from .thread import SendAccountActivationEmail , SendForgetPasswordEmail
-from .thread import *
+from datetime import datetime
+
+from .thread import SendAccountActivationEmail, SendForgetPasswordEmail
 
 
 
@@ -20,17 +20,27 @@ class UserOTP(models.Model):
 
 
 @receiver(post_save, sender=User)
-def send_email_token(sender, instance, created, **kwargs):
+def send_activation_email_otp(sender, instance, created, **kwargs):
     try:
         if created:
-            subject = "noreply: Here is your OTP for account activation."
-            otp = send_account_otp(email=instance.email, user=instance, subject=subject)
-            forget_password_user = UserOTP()
-            forget_password_user.user = instance
-            forget_password_user.user_otp = otp
-            forget_password_user.save()
-            logging.info(f"Email delivered to {instance.email} around {time.now()}")
+
             # ''' EXCEUTING THREAD TO SEND EMAIL '''
-            #SendAccountActivationEmail(email=instance.email, user=instance).start()
+            thread = SendAccountActivationEmail(email=instance.email, user=instance)
+            # start thread
+            thread.start()
+            # join a new thread to unfinished one
+            thread.join()
+            otp = thread.get_user_otp()
+            update_user_otp_model(instance, otp)
+
+            logging.info(f"Email delivered to {instance.username} around {datetime.now()}")
+
     except Exception as e:
-        logging.warning(e)
+        logging.debug(e)
+
+
+def update_user_otp_model(instance, otp):
+    user_otp_obj = UserOTP()
+    user_otp_obj.user = instance
+    user_otp_obj.user_otp = otp
+    user_otp_obj.save()
