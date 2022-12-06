@@ -68,7 +68,7 @@ class GathpayUsersAccounts(APIView):
 
 class GathpayUserAccount(APIView):
     """ Authorized Specific User Account View"""
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk, *args, **kwargs):
         """ Specific User Account Fetch """
@@ -259,7 +259,7 @@ class GathpayUserResetPassword(APIView):
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            user_otp_obj.user_otp = ""
+            user_otp_obj.user_otp = "OTP consumed"
             user_otp_obj.save()
             return Response({
                 "message": "Success. Your password has been updated.",
