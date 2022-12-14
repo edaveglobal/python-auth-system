@@ -58,6 +58,7 @@ class GathpayUsersAccounts(APIView):
             return Response({
                 "message": "Successfully fetched Gathpay users' accounts.",
                 "statusCode": status.HTTP_200_OK,
+                "total_querysets": len(users),
                 "accounts": users
             })
         return Response({
@@ -73,7 +74,7 @@ class GathpayUserAccount(APIView):
     def get(self, request, pk, *args, **kwargs):
         """ Specific User Account Fetch """
         try:
-            user = User.objects.filter(id=pk).first()
+            user = User.objects.get(id=pk)
         except Exception as err:
             logging.debug(err)
             return Response({
@@ -99,7 +100,7 @@ class GathpayUserAccount(APIView):
     def put(self, request, pk, *args, **kwargs):
         """ User Account Details Update """
         try:
-            user = User.objects.filter(id=pk).first()
+            user = User.objects.get(id=pk)
         except Exception as err:
             logging.warning(err)
             error = {
@@ -133,7 +134,7 @@ class GathpayUserAccount(APIView):
     def patch(self, request, pk, *args, **kwargs):
         """ User Account Details Patch"""
         try:
-            user = User.objects.filter(id=pk).first()
+            user = User.objects.get(id=pk)
         except Exception as err:
             logging.warning(err)
             error = {
@@ -169,7 +170,7 @@ class GathpayUserAccount(APIView):
 
     def delete(self, request, pk, *args, **kwargs):
         try:
-            user = User.objects.filter(id=pk).first()
+            user = User.objects.get(id=pk)
         except Exception as err:
             logging.warning(err)
             return Response({

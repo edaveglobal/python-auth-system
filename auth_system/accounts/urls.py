@@ -12,7 +12,7 @@ urlpatterns = [
         views.GathpayUsersAccounts.as_view(),
         name="get-usersaccounts"),
     path(
-        'users/account/<int:pk>/',
+        'users/<int:pk>/account/',
         views.GathpayUserAccount.as_view(),
         name="get_update_delete_useraccount"),
     path(

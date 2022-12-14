@@ -193,15 +193,15 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000"
 ]
 
-EMAIL_HOST = 'smtp.mailtrap.io'
-EMAIL_HOST_USER = '6bbf84eeff5d0b'
-EMAIL_HOST_PASSWORD = '4da21a3b1535ca'
-EMAIL_PORT = '2525' 
+# EMAIL_HOST = os.getenv('EMAIL_HOST')
+# EMAIL_HOST_USER = '6bbf84eeff5d0b'
+# EMAIL_HOST_PASSWORD = '4da21a3b1535ca'
+# EMAIL_PORT = '2525' 
 
 CELERY_EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', '') 
-# EMAIL_HOST = str(os.getenv('EMAIL_HOST', ''))
-# EMAIL_HOST_USER = str(os.getenv('EMAIL_HOST_USER', ''))
-# EMAIL_PORT = str(os.getenv('EMAIL_PORT', ''))
-# EMAIL_USE_TLS = str(os.getenv('EMAIL_USE_TLS', False))
-# EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_HOST_PASSWORD', ''))
+EMAIL_HOST = str(os.getenv('EMAIL_HOST', ''))
+EMAIL_HOST_USER = str(os.getenv('EMAIL_HOST_USER', ''))
+EMAIL_PORT = str(os.getenv('EMAIL_PORT', ''))
+EMAIL_USE_TLS = bool(os.getenv('EMAIL_USE_TLS', False))
+EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_HOST_PASSWORD', ''))
 # EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', 60))

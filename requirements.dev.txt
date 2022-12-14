@@ -16,7 +16,6 @@ django-storages
 flake8
 gunicorn
 pylint
-psycopg2
 psycopg2-binary
 pytest
 pytest-django
