@@ -6,8 +6,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from .helpers import send_account_otp
-from .models import UserOTP
-from .thread import SendAccountActivationEmail
+from .models import UserOTP, update_user_otp_model
+from .thread import SendAccountOTP
 
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
@@ -226,10 +226,16 @@ class GathpayUserForgotPassword(APIView):
             })
         try:
             subject = "noreply: OTP required to update your password."
-            otp = send_account_otp(email=user.email, user=user, subject=subject)
-            user_otp_obj = UserOTP.objects.get(user=user.id)
-            user_otp_obj.user_otp = otp
-            user_otp_obj.save()
+            thread = SendAccountOTP(email=user.email, user=user, subject=subject)
+            # start thread
+            thread.start()
+            # join a new thread to unfinished one
+            thread.join()
+            otp = thread.get_user_otp()
+            # user_otp_obj = UserOTP.objects.get(user=user.id)
+            update_user_otp_model(type="views", instance=user, otp=otp)
+            # user_otp_obj.user_otp = otp
+            # user_otp_obj.save()
             return Response({
             "message": "Success. Check your email for otp.",
             "statuCode": status.HTTP_200_OK
