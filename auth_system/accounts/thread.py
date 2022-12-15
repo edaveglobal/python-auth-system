@@ -13,7 +13,8 @@ class SendAccountOTP(threading.Thread):
         self._email = email
         self._subject = subject
         self._user = user
-        self._otp = 0
+        self._otp = 0,
+        self._result = None
         threading.Thread.__init__(self)
     
     def run(self):

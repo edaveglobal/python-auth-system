@@ -8,8 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 from django.core.cache import cache
 
-from .email import send_account_otp
-from .models import UserOTP
+# from .models import UserVerifiedModel
 from .thread import SendAccountOTP, SendForgotPasswordOTP
 from .cache import get_cached_otp_for, set_otp_cache_for
 
@@ -309,6 +308,7 @@ class GathpayUserAccountActivate(APIView):
             )
             
         if cached_otp == OTP:
+           
             return  APIResponse.send(
                 message=f"Account verified successfully.",
                 status=status.HTTP_200_OK,
