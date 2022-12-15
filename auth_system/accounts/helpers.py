@@ -15,15 +15,3 @@ def send_account_otp(email , user, subject):
         logging.warning(e)
         return
     return otp
-
-# def update_user_otp_model(type, instance, otp):
-#     """ Instantiating User OTP Model to store otp. """
-#     user_otp_obj = None
-#     if type == "model":
-#         user_otp_obj = UserOTP()
-#         user_otp_obj.user = instance
-#     elif type == "views":
-#         user_otp_obj = UserOTP.objects.get(user=instance.id)
-        
-#     user_otp_obj.user_otp = otp
-#     user_otp_obj.save()
