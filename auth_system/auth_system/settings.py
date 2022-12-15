@@ -136,7 +136,10 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS_ORIGIN_ALLOW_ALL = True
+CELERY_EMAIL_TASK_CONFIG = {
+    'name': 'djcelery_email_send',
+    'ignore_result': False,
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
