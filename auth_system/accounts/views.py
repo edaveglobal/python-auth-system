@@ -1,21 +1,40 @@
 
 import logging
+import hashlib
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from django.conf import settings
+from django.core.cache import cache
 
-from .helpers import send_account_otp
-from .models import UserOTP, update_user_otp_model
-from .thread import SendAccountOTP
+from .email import send_account_otp
+from .models import UserOTP
+from .thread import SendAccountOTP, SendForgotPasswordOTP
+from .cache import get_cached_otp_for, set_otp_cache_for
 
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
     GathpayUsersAccountSerializer,
-    ForgetPasswordAccountSerializer,
+    ResetPasswordAccountSerializer,
     UpdateUserAccountPasswordSerializer
 )
 from django.contrib.auth.models import User
+
+
+#redis_instance = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0)
+
+class APIResponse:
+    
+    @staticmethod
+    def send(message, status, err=""):
+        return Response(
+            {
+                "message": message,
+                "statu_code": status,
+                "error": err
+            }
+        ) 
 
 class GathpayUsersAccount(APIView):
     """ Authorized Specific Users Account View"""
@@ -27,14 +46,14 @@ class GathpayUsersAccount(APIView):
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(
-                {
-                    "message": f"Gathpay user {data['first_name']} account is successfully registered. Kindly check your mail for OTP.",
-                    "statusCode": status.HTTP_201_CREATED})
-        return Response(
-            {
-                "message": f"User with first name {data['first_name']} failed to register.",
-                "statusCode": status.HTTP_400_BAD_REQUEST})
+            return APIResponse.send(
+                message=f"Gathpay user {data['first_name']} account is successfully registered. Kindly check your mail for OTP.",
+                status=status.HTTP_201_CREATED,
+            )
+        return APIResponse.send(
+                message=f"User with first name {data['first_name']} failed to register.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class GathpayUsersAccounts(APIView):
@@ -48,7 +67,7 @@ class GathpayUsersAccounts(APIView):
             logging.debug(err)
             return Response({
                 "message": "Internal server error. Unable to fetch users' accounts.",
-                "statusCode": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 "error": err
             })
 
@@ -57,13 +76,13 @@ class GathpayUsersAccounts(APIView):
             users = serializer(users, many=True).data
             return Response({
                 "message": "Successfully fetched Gathpay users' accounts.",
-                "statusCode": status.HTTP_200_OK,
+                "status_code": status.HTTP_200_OK,
                 "total_querysets": len(users),
                 "accounts": users
             })
         return Response({
             "message": serializer.errors,
-            "statusCode": status.HTTP_409_CONFLICT,
+            "status_code": status.HTTP_409_CONFLICT,
         })
 
 
@@ -79,7 +98,7 @@ class GathpayUserAccount(APIView):
             logging.debug(err)
             return Response({
                 "message": f"Gathpay user account with id {pk} not found.",
-                "statusCode": status.HTTP_404_NOT_FOUND,
+                "status_code": status.HTTP_404_NOT_FOUND,
                 "error": str(err)
             })
 
@@ -89,12 +108,12 @@ class GathpayUserAccount(APIView):
             data = serializer(user, many=False).data
             return Response({
                 "message": f"Gathpay user account {pk} found successfully.",
-                "statusCode": status.HTTP_200_OK,
+                "status_code": status.HTTP_200_OK,
                 "user": data
             })
         return Response({
             "message": serializer.errors,
-            "statusCode": status.HTTP_409_CONFLICT
+            "status_code": status.HTTP_409_CONFLICT
         })
 
     def put(self, request, pk, *args, **kwargs):
@@ -105,7 +124,7 @@ class GathpayUserAccount(APIView):
             logging.warning(err)
             error = {
                 "message": f"Gathpay user account with id {pk} does not exist.",
-                "statusCode": status.HTTP_404_NOT_FOUND,
+                "status_code": status.HTTP_404_NOT_FOUND,
                 "error": str(err)}
             return Response(error)
 
@@ -118,7 +137,7 @@ class GathpayUserAccount(APIView):
 
             response = {
                 "message": f"Gathpay user account with id {pk} is successfully updated.",
-                "statusCode": status.HTTP_200_OK,
+                "status_code": status.HTTP_200_OK,
                 "data": serializer.data
                 }
 
@@ -126,7 +145,7 @@ class GathpayUserAccount(APIView):
 
         error = {
             "message": f"Gathpay user account with id {pk} is not successfully updated.",
-            "statusCode": status.HTTP_400_BAD_REQUEST,
+            "status_code": status.HTTP_400_BAD_REQUEST,
             "error": serializer.errors
             }
         return Response(error)
@@ -139,7 +158,7 @@ class GathpayUserAccount(APIView):
             logging.warning(err)
             error = {
                 "message": f"Gathpay user account with id {pk} does not exist.",
-                "statusCode": status.HTTP_404_NOT_FOUND,
+                "status_code": status.HTTP_404_NOT_FOUND,
                 "error": str(err)}
             return Response(error)
 
@@ -156,7 +175,7 @@ class GathpayUserAccount(APIView):
 
             response = {
                 "message": f"Gathpay user account with id {pk} is not successfully patched.",
-                "statusCode": status.HTTP_200_OK,
+                "status_code": status.HTTP_200_OK,
                 "data": serializer.data
                 }
 
@@ -164,7 +183,7 @@ class GathpayUserAccount(APIView):
 
         error = {
             "message": f"Gathpay user account with id {pk} is not successfully patched.",
-            "statusCode": status.HTTP_400_BAD_REQUEST,
+            "status_code": status.HTTP_400_BAD_REQUEST,
             "error": serializer.errors}
         return Response(error)
 
@@ -175,14 +194,14 @@ class GathpayUserAccount(APIView):
             logging.warning(err)
             return Response({
                 "message": f"Gathpay user account with id {pk} not found.",
-                "statusCode": status.HTTP_404_NOT_FOUND,
+                "status_code": status.HTTP_404_NOT_FOUND,
                 "error": str(err)
             })
 
         user.delete()
         return Response({
             "message": f"Gathpay user account with id {pk} deleted successfully.",
-            "statusCode": status.HTTP_200_OK
+            "status_code": status.HTTP_200_OK
         })
 
 
@@ -199,11 +218,11 @@ class GathpayUserChangePassword(APIView):
             serializer.save()
             return Response({
                 "message": "Password updated successfully.",
-                "statuCode": status.HTTP_200_OK
+                "status_code": status.HTTP_200_OK
             })
         return Response({
             "message": str(serializer.errors),
-            "statuCode": status.HTTP_409_CONFLICT
+            "status_code": status.HTTP_409_CONFLICT
         })
 
 
@@ -211,92 +230,91 @@ class GathpayUserForgotPassword(APIView):
     """ Unathorized User Forgot Password View """
 
     permission_classes = []
-
+    pass
     def post(self, request, *args, **kwargs): 
 
         try:
             user = User.objects.get(email=request.data['email'])
-            
         except Exception as err:
             logging.debug(err)
             return Response({
                 "message": f"Gathpay user account with email {request.data['email']} not found.",
-                "statusCode": status.HTTP_404_NOT_FOUND,
+                "status_code": status.HTTP_404_NOT_FOUND,
                 "error": str(err)
             })
-        try:
-            subject = "noreply: OTP required to update your password."
-            thread = SendAccountOTP(email=user.email, user=user, subject=subject)
-            # start thread
-            thread.start()
-            # join a new thread to unfinished one
-            thread.join()
-            otp = thread.get_user_otp()
-            # user_otp_obj = UserOTP.objects.get(user=user.id)
-            update_user_otp_model(type="views", instance=user, otp=otp)
-            # user_otp_obj.user_otp = otp
-            # user_otp_obj.save()
-            return Response({
+        # ''' EXCEUTING THREAD TO SEND OTP FOR FORGOT PASSWORD'''
+        subject = "noreply: OTP required to update your password."
+        SendForgotPasswordOTP(subject=subject, email=user.email, user=user).start()
+        return Response({
             "message": "Success. Check your email for otp.",
-            "statuCode": status.HTTP_200_OK
-             })
-        except Exception as e:
-            return Response({
-            "message": "Failed to send otp.",
-            "statuCode": status.HTTP_503_SERVICE_UNAVAILABLE
-        })
+            "status_code": status.HTTP_200_OK
+            })
+        # except Exception as e:
+        #     return Response({
+        #     "message": "Failed to send otp.",
+        #     "status_code": status.HTTP_503_SERVICE_UNAVAILABLE
+        # })
             
 
 class GathpayUserResetPassword(APIView):
-
+    """ Unauthorized User Account Reset Password View"""
+    permission_classes = []
+    pass
     def post(self, request, *args, **kwargs):
         
+        OTP = request.data['otp']
         try:
-            user_otp_obj = UserOTP.objects.get(user_otp=request.data['otp'])
-        except Exception as err:
-            logging.debug(err)
-            return Response({
-                "message": f"Gathpay user account with the one-time-password not found.",
-                "statusCode": status.HTTP_404_NOT_FOUND,
-                "error": str(err)
-            })
-        
-        serializer = ForgetPasswordAccountSerializer
-        serializer = serializer(instance=user_otp_obj.user, data=request.data)
+            cached_username = get_cached_otp_for(otp=OTP, type="reset")
+            user = User.objects.get(username=cached_username)
+        except Exception as e:
+            logging.debug(e)
+            return  APIResponse.send(
+                message="Catch missed. OTP not found.",
+                status=status.HTTP_404_NOT_FOUND,
+                err=str(e)
+            )
+        serializer = ResetPasswordAccountSerializer
+        serializer = serializer(instance=user, data=request.data)
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            user_otp_obj.user_otp = "OTP consumed"
-            user_otp_obj.save()
+
             return Response({
                 "message": "Success. Your password has been updated.",
-                "statuCode": status.HTTP_202_ACCEPTED
+                "status_code": status.HTTP_202_ACCEPTED
             })
         logging.warning(serializer.errors)
         return Response({
             "message": "Failed operation.",
-            "statusCode": status.HTTP_404_NOT_FOUND,
+            "status_code": status.HTTP_404_NOT_FOUND,
             "error": str(serializer.errors)
         })
 
 
 
 class GathpayUserAccountActivate(APIView):
+    """ Unauthorized User Account Activate View"""
     permission_classes = []
 
     def post(self, request, *args, **kwargs):
         OTP = request.data['otp']
+        
         try:
-            user_otp_obj = UserOTP.objects.get(user_otp=OTP)
+            cached_otp = get_cached_otp_for(otp=OTP, type="verify")
         except Exception as e:
             logging.debug(e)
-            return Response({
-                "message": f"User account with OTP {request.data['otp']} not found.",
-                "statusCode": status.HTTP_404_NOT_FOUND
-            })
-        user_otp_obj.user_otp = "OTP already used"
-        user_otp_obj.save()
-        return Response({
-            "message": "User email verified successfully.",
-            "statuCode": status.HTTP_200_OK
-            })
+            return  APIResponse.send(
+                message="Catch missed. OTP not found.",
+                status=status.HTTP_404_NOT_FOUND,
+            )
+            
+        if cached_otp == OTP:
+            return  APIResponse.send(
+                message=f"Account verified successfully.",
+                status=status.HTTP_200_OK,
+            )
+        
+        return APIResponse.send(
+                message=f"Account verification failed. OTP {OTP} supplied is not matched.",
+                status=status.HTTP_409_CONFLICT,
+            )

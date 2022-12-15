@@ -155,6 +155,13 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
 
 # Logging Configuration
 logging.basicConfig(level=(logging.DEBUG))
@@ -205,3 +212,7 @@ EMAIL_PORT = str(os.getenv('EMAIL_PORT', ''))
 EMAIL_USE_TLS = bool(os.getenv('EMAIL_USE_TLS', False))
 EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_HOST_PASSWORD', ''))
 # EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', 60))
+
+
+REDIS_HOST = str(os.getenv('REDIS_HOST', 'localhost'))
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
