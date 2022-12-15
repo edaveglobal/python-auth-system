@@ -39,7 +39,7 @@ jobs:
       max-parallel: 16
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.9', '3.10']
+        python-version: ['3.8', '3.10']
 
     steps:
     - name: Checkout Code

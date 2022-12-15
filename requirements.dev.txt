@@ -15,7 +15,7 @@ django-sendgrid-v5
 django-storages
 flake8
 gunicorn
-redis=4.4.0
+redis==4.4.0
 pylint
 psycopg2-binary
 pytest
