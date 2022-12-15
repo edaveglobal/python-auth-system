@@ -139,7 +139,7 @@ class UpdateUserAccountPasswordSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ForgetPasswordAccountSerializer(serializers.ModelSerializer):
+class ResetPasswordAccountSerializer(serializers.ModelSerializer):
 
     new_password = serializers.CharField(
         write_only=True,
