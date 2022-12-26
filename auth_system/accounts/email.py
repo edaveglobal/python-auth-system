@@ -1,11 +1,12 @@
-import random
+import secrets
 import logging
 from django.core.mail import send_mail
+from smtplib import SMTPException
 from auth_system.settings import EMAIL_HOST_USER
         
             
 def send_account_otp(email , user, subject):
-    otp = random.randint(1000, 9999)
+    otp = secrets.choice(range(1000, 10000))
     message = f'Hi {user.username},\n\nYour account one-time-password is {otp}.\
         \nThis one-time-password will expire in the next 10 minutes.\
         \nKindly supply it to move forward in the pipeline.\n\n\nCheers\nGathpay Team'
@@ -13,7 +14,7 @@ def send_account_otp(email , user, subject):
     recipient_list = [email,]
     try:
         send_mail(subject, message, email_from, recipient_list)
-    except Exception as e:
-        logging.warning(e)
+    except SMTPException as e:
+        logging.debug('There was an error sending an email. '+ e)
         return
     return otp

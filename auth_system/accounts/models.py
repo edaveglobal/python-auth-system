@@ -27,10 +27,10 @@ def send_activation_email_otp(sender, instance, created, **kwargs):
         if created:
 
             # ''' EXCEUTING THREAD TO SEND EMAIL '''
-            subject = "noreply: Here is your OTP for account activation."
+            subject = "noreply@Gathpay: Here is your OTP for account activation."
             SendAccountOTP(subject=subject, email=instance.email, user=instance).start()
 
-    except Exception as e:
+    except SystemError as e:
         logging.debug(e)
     
     update_user_verified_model(instance)

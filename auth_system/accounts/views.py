@@ -242,18 +242,12 @@ class GathpayUserForgotPassword(APIView):
                 "error": str(err)
             })
         # ''' EXCEUTING THREAD TO SEND OTP FOR FORGOT PASSWORD'''
-        subject = "noreply: OTP required to update your password."
+        subject = "noreply@Gathpay: OTP required to reset your password."
         SendForgotPasswordOTP(subject=subject, email=user.email, user=user).start()
         return Response({
             "message": "Success. Check your email for otp.",
             "status_code": status.HTTP_200_OK
             })
-        # except Exception as e:
-        #     return Response({
-        #     "message": "Failed to send otp.",
-        #     "status_code": status.HTTP_503_SERVICE_UNAVAILABLE
-        # })
-            
 
 class GathpayUserResetPassword(APIView):
     """ Unauthorized User Account Reset Password View"""
@@ -274,15 +268,14 @@ class GathpayUserResetPassword(APIView):
             )
         serializer = ResetPasswordAccountSerializer
         serializer = serializer(instance=user, data=request.data)
-
         if serializer.is_valid(raise_exception=True):
             serializer.save()
 
             return Response({
-                "message": "Success. Your password has been updated.",
+                "message": "Success. Your password has been updated. Log in with your new password.",
                 "status_code": status.HTTP_202_ACCEPTED
             })
-        logging.warning(serializer.errors)
+        logging.debug('Serializer is not valid. ' + serializer.errors)
         return Response({
             "message": "Failed operation.",
             "status_code": status.HTTP_404_NOT_FOUND,

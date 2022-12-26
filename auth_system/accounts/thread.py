@@ -3,6 +3,8 @@ import threading
 import logging
 import hashlib
 from datetime import datetime
+from smtplib import SMTPException
+
 
 from .email import send_account_otp
 from .cache import set_otp_cache_for
@@ -22,8 +24,8 @@ class SendAccountOTP(threading.Thread):
             self._otp = send_account_otp(email=self._email, user=self._user, subject=self._subject)
             set_otp_cache_for(otp=self._otp, type="verify")
             logging.info(f"Email service delivered to {self._user.username} around {datetime.now()}")
-        except Exception as e:
-            logging.debug(e)
+        except SMTPException as e:
+            logging.debug('There was an error sending an email. '+ e)
         
        
     
