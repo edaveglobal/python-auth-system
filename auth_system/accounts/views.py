@@ -11,6 +11,7 @@ from django.core.cache import cache
 # from .models import UserVerifiedModel
 from .thread import SendAccountOTP, SendForgotPasswordOTP
 from .cache import get_cached_otp_for, set_otp_cache_for
+from .models import update_user_verified_for
 
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
@@ -301,13 +302,14 @@ class GathpayUserAccountActivate(APIView):
             )
             
         if cached_otp == OTP:
-           
+            instance = User.objects.get(email=request.data['email'])
+            update_user_verified_for(instance)
             return  APIResponse.send(
                 message=f"Account verified successfully.",
                 status=status.HTTP_200_OK,
             )
         
         return APIResponse.send(
-                message=f"Account verification failed. OTP {OTP} supplied is not matched.",
+                message=f"Account verification failed. OTP {OTP} supplied is not matched or expired.",
                 status=status.HTTP_409_CONFLICT,
             )
