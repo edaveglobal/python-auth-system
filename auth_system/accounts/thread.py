@@ -44,7 +44,7 @@ class SendForgotPasswordOTP(threading.Thread):
             self._otp = send_account_otp(email=self._email, user=self._user, subject=self._subject)
             set_otp_cache_for(otp=self._otp, username=self._user.username, type="reset")
             logging.info(f"Email service delivered to {self._user.username} around {datetime.now()}")
-        except Exception as e:
+        except SMTPException as e:
             logging.debug(e)
         
         
