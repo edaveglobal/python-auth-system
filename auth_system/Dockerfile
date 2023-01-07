@@ -1,7 +1,7 @@
 FROM python:3.8-slim-buster
 
 COPY . /app
-WORKDIR /app/auth_system
+WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -19,4 +19,4 @@ RUN /opt/venv/bin/pip install pip --upgrade && \
     /opt/venv/bin/pip install -r requirements.prod.txt && \
     chmod +x entrypoint.sh
 
-CMD ["entrypoint.sh"]
+CMD ["/app/entrypoint.sh"]
