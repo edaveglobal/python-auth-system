@@ -6,6 +6,7 @@ djangorestframework
 djangorestframework-simplejwt
 django-utils-six
 django-rest-authemail
+djoser
 gunicorn
 python-memcached==1.59
 pylint
