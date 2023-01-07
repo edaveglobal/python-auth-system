@@ -22,7 +22,7 @@ DOMAIN = "localhost:3000"
 
 if not DEBUG:
     PROTOCOL = "https"
-    DOMAIN = ""
+    DOMAIN = "https://gathpay-auth-qb9l6.ondigitalocean.app/"
 
 CSRF_TRUSTED_ORIGINS = ['https://gathpay-auth-qb9l6.ondigitalocean.app/']
 
@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
-    'storages',
     'djcelery_email',
     'accounts'
 ]

@@ -1,8 +1,10 @@
+autopep8
 Django==4.0
 django-cors-headers
 django-celery-email
 djangorestframework
 djangorestframework-simplejwt
+django-utils-six
 django-rest-authemail
 gunicorn
 python-memcached==1.59
