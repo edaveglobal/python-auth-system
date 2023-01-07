@@ -16,7 +16,7 @@ RUN apt-get update --fix-missing \
     && pip install psycopg2
 
 RUN /opt/venv/bin/pip install pip --upgrade && \
-    /opt/venv/bin/pip install -r requirements.dev.txt && \
+    /opt/venv/bin/pip install -r requirements.prod.txt && \
     chmod +x entrypoint.sh
 
 CMD ["/app/entrypoint.sh"]
