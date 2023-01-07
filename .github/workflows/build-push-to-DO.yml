@@ -18,8 +18,15 @@ jobs:
   install-test-format_job:
     uses: gathpay/auth-system/.github/workflows/install-test-format.yml@main
 
+  
+
   build_and_push:
-    # needs: [install-test-format_job]
+    needs: [install-test-format_job]
+
+    defaults:
+      run:
+        working-directory: ./auth_system
+        
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo 
