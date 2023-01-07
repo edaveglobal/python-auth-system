@@ -1,0 +1,16 @@
+Django==4.0
+django-cors-headers
+django-celery-email
+djangorestframework
+djangorestframework-simplejwt
+django-rest-authemail
+gunicorn
+python-memcached==1.59
+pylint
+psycopg2-binary
+pytest
+pytest-django
+python-dotenv
+requests
+six
+whitenoise

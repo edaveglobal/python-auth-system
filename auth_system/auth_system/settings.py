@@ -24,7 +24,9 @@ if not DEBUG:
     PROTOCOL = "https"
     DOMAIN = ""
 
-ALLOWED_HOSTS = []
+CSRF_TRUSTED_ORIGINS = ['https://gathpay-auth-qb9l6.ondigitalocean.app/']
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'https://gathpay-auth-qb9l6.ondigitalocean.app/']
 
 
 # Application definition

@@ -1,0 +1,5 @@
+../build-push-notes.md
+../requirements.dev.txt
+.gitigignore
+LICENSE
+TestsCases/
