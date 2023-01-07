@@ -1,0 +1,39 @@
+
+name: Build Docker Image & Push to DO Registry
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+#2
+env:
+  REGISTRY: registry.digitalocean.com/gathpay-auth
+  IMAGE_NAME: gathpay/auth-backend-v1
+  DIGITALOCEAN_ACCESS_TOKEN: dop_v1_0ac7c146fa8e73c0d8cd21e7051ae64b2488c0d778c4742a738669d8c98166e7
+
+#3
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo 
+        uses: actions/checkout@v2
+        
+      - name: Build container image
+        run: docker build -t $(echo $REGISTRY)/$(echo $IMAGE_NAME):latest .
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: dop_v1_0ac7c146fa8e73c0d8cd21e7051ae64b2488c0d778c4742a738669d8c98166e7
+    
+      - name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 600
+      
+      - name: Remove all old images
+        run: if [ ! -z "$(doctl registry repository list | grep "$(echo $IMAGE_NAME)")" ]; then doctl registry repository delete-manifest $(echo $IMAGE_NAME) $(doctl registry repository list-tags $(echo $IMAGE_NAME) | grep -o "sha.*") --force; else echo "No repository"; fi
+
+      - name: Push image to DigitalOcean Container Registry
+        run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME):latest
