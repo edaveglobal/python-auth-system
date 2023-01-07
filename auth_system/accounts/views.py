@@ -313,3 +313,38 @@ class GathpayUserAccountActivate(APIView):
                 message=f"Account verification failed. OTP {OTP} supplied is not matched or expired.",
                 status=status.HTTP_409_CONFLICT,
             )
+        
+        
+class GathpayUserResendAccountOTP(APIView):
+    permission_classes = []
+    
+    def post(request, *args, **kwargs):
+        email = request.data['email']
+        
+        try:
+            instance = User.objects.get(email=email)
+        except Exception as e:
+            logging.debug(e)
+            return  APIResponse.send(
+                message=f"Gathpay user account with email {email} not found.",
+                status=status.HTTP_404_NOT_FOUND,
+                error=str(e)
+            )
+        
+        try:
+            ''' EXCEUTING THREAD TO SEND EMAIL '''
+            subject = "noreply@Gathpay: Here is your OTP for account activation."
+            SendAccountOTP(subject=subject, email=instance.email, user=instance).start()
+            
+        except SMTPException as e:
+            logging.debug(e)
+            return  APIResponse.send(
+                message=f"Email verification OTP could not send.",
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                error=str(e)
+            )
+        
+        return  APIResponse.send(
+                message=f"Account verification OTP sent.",
+                status=status.HTTP_200_OK,
+            )

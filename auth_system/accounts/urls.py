@@ -33,7 +33,13 @@ urlpatterns = [
         'users/account/activate', 
         views.GathpayUserAccountActivate.as_view(),
         name="activate-account"
-    )
+    ),
+    
+    path(
+        'users/account/resend_otp', 
+        views.GathpayUserResendAccountOTP.as_view(),
+        name="resend-otp"
+    ), 
     
 ]
     
