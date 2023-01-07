@@ -1,4 +1,4 @@
-name: Install Dependecies, Run Pytest, and Format codes
+name: Install Dependecies, Run Test, and Format codes
 
 on:
   workflow_call:
