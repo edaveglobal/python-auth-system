@@ -1,5 +1,5 @@
 import hashlib
-
+import logging
 from django.core.cache import cache
 
 
@@ -41,16 +41,11 @@ def get_cached_otp_for(otp, type):
     """ 
         args: otp -> key string,
             type string: kind of operation
-        returns: value of otp or username cached
+        returns: tuple of values (key and otp/username)
     """
-    cached_otp = "" or 0
     try:
-        cache_key = _get_hash_for(otp, type)
-        cached_otp = cache.get(cache_key)
+        cached_key = _get_hash_for(otp, type)
+        cached_val = cache.get(cached_key)
     except Exception as e:
         logging.debug(e)
-        
-    return cached_otp
-
-
-
+    return (cached_key, cached_val)

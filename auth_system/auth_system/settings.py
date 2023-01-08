@@ -15,7 +15,7 @@ load_dotenv()
 SECRET_KEY = str(os.getenv('SECRET_KEY', ''))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.getenv('DEBUG', False))
+DEBUG = bool(os.getenv('DEBUG', False)) == True
 
 PROTOCOL = "http"
 DOMAIN = "localhost:3000"
@@ -217,6 +217,30 @@ EMAIL_USE_TLS = bool(os.getenv('EMAIL_USE_TLS', False))
 EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_HOST_PASSWORD', ''))
 # EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', 60))
 
+def get_cache():
+  try:
+    servers = os.environ['MEMCACHIER_SERVERS']
+    username = os.environ['MEMCACHIER_USERNAME']
+    password = os.environ['MEMCACHIER_PASSWORD']
+    return {
+      'default': {
+        'BACKEND': 'django_bmemcached.memcached.BMemcached',
+        # TIMEOUT is not the connection timeout! It's the default expiration
+        # timeout that should be applied to keys! Setting it to `None`
+        # disables expiration.
+        'TIMEOUT': 60*10,
+        'LOCATION': servers,
+        'OPTIONS': {
+          'username': username,
+          'password': password,
+        }
+      }
+    }
+  except:
+    return {
+      'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+      }
+    }
 
-REDIS_HOST = str(os.getenv('REDIS_HOST', 'localhost'))
-REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+CACHES = get_cache()

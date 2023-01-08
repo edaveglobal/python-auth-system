@@ -30,13 +30,13 @@ urlpatterns = [
         name="change-password"),
 
     path(
-        'users/account/activate', 
-        views.GathpayUserAccountActivate.as_view(),
+        'users/account/verify', 
+        views.GathpayUserAccountVerify.as_view(),
         name="activate-account"
     ),
     
     path(
-        'users/account/resend_otp', 
+        'users/account/verify/resend_otp', 
         views.GathpayUserResendAccountOTP.as_view(),
         name="resend-otp"
     ), 

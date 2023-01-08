@@ -7,8 +7,8 @@ djangorestframework-simplejwt
 django-utils-six
 django-rest-authemail
 djoser
+django-bmemcached==0.2.4
 gunicorn
-python-memcached==1.59
 pylint
 psycopg2-binary
 pytest

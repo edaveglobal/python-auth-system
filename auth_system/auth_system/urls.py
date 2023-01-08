@@ -18,12 +18,6 @@ urlpatterns = [
         TokenRefreshView.as_view(),
         name='token_refresh'),
     path(
-        'auth/', include('djoser.urls'),
-    ),
-    path(
-        'auth/', include('djoser.urls.jwt')
-    ),
-    path(
         'api/v1/',
         include('accounts.urls'), 
         name="accounts"

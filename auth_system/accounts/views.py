@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.conf import settings
 from django.core.cache import cache
+from smtplib import SMTPException
 
 # from .models import UserVerifiedModel
 from .thread import SendAccountOTP, SendForgotPasswordOTP
@@ -31,7 +32,7 @@ class APIResponse:
         return Response(
             {
                 "message": message,
-                "statu_code": status,
+                "status_code": status,
                 "error": err
             }
         ) 
@@ -230,11 +231,11 @@ class GathpayUserForgotPassword(APIView):
     """ Unathorized User Forgot Password View """
 
     permission_classes = []
-    pass
+    
     def post(self, request, *args, **kwargs): 
-
+        EMAIL = request.data['email']
         try:
-            user = User.objects.get(email=request.data['email'])
+            user = User.objects.get(email=EMAIL)
         except Exception as err:
             logging.debug(err)
             return Response({
@@ -242,24 +243,35 @@ class GathpayUserForgotPassword(APIView):
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "error": str(err)
             })
-        # ''' EXCEUTING THREAD TO SEND OTP FOR FORGOT PASSWORD'''
-        subject = "noreply@Gathpay: OTP required to reset your password."
-        SendForgotPasswordOTP(subject=subject, email=user.email, user=user).start()
-        return Response({
-            "message": "Success. Check your email for otp.",
-            "status_code": status.HTTP_200_OK
-            })
+        try:
+            ''' EXCEUTING THREAD TO SEND EMAIL '''
+            
+            subject = "noreply@Gathpay: Here is the OTP for account forgot password."
+            SendForgotPasswordOTP(subject=subject, email=user.email, user=user).start()
+            
+        except SMTPException as e:
+            logging.debug(e)
+            return  APIResponse.send(
+                message=f"Failed. Email verification OTP could not send.",
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                error=str(e)
+            )
+        
+        return  APIResponse.send(
+                message=f"Account verification OTP sent sucessfully.",
+                status=status.HTTP_200_OK,
+            )
 
 class GathpayUserResetPassword(APIView):
     """ Unauthorized User Account Reset Password View"""
+    
     permission_classes = []
-    pass
     def post(self, request, *args, **kwargs):
         
         OTP = request.data['otp']
         try:
-            cached_username = get_cached_otp_for(otp=OTP, type="reset")
-            user = User.objects.get(username=cached_username)
+            cached_values = get_cached_otp_for(otp=OTP, type="reset")
+           
         except Exception as e:
             logging.debug(e)
             return  APIResponse.send(
@@ -267,48 +279,62 @@ class GathpayUserResetPassword(APIView):
                 status=status.HTTP_404_NOT_FOUND,
                 err=str(e)
             )
+            
+        cached_key = cached_values[0]
+        cached_username = cached_values[1]
+        
+        user = User.objects.get(username=cached_username)
+        
+        # if user.exist():
         serializer = ResetPasswordAccountSerializer
         serializer = serializer(instance=user, data=request.data)
-        if serializer.is_valid(raise_exception=True):
+    
+        if serializer.is_valid():
             serializer.save()
-
+            cache.delete(cached_key)
             return Response({
                 "message": "Success. Your password has been updated. Log in with your new password.",
                 "status_code": status.HTTP_202_ACCEPTED
             })
-        logging.debug('Serializer is not valid. ' + serializer.errors)
+            
+        logging.debug(str(serializer.errors))
+        
         return Response({
             "message": "Failed operation.",
             "status_code": status.HTTP_404_NOT_FOUND,
             "error": str(serializer.errors)
-        })
+            })
 
 
 
-class GathpayUserAccountActivate(APIView):
+class GathpayUserAccountVerify(APIView):
     """ Unauthorized User Account Activate View"""
+    
     permission_classes = []
 
     def post(self, request, *args, **kwargs):
         OTP = request.data['otp']
-        
+        EMAIL = request.data['email']
         try:
-            cached_otp = get_cached_otp_for(otp=OTP, type="verify")
+            cached_values = get_cached_otp_for(otp=OTP, type="verify")
         except Exception as e:
             logging.debug(e)
             return  APIResponse.send(
                 message="Catch missed. OTP not found.",
                 status=status.HTTP_404_NOT_FOUND,
             )
-            
+        cached_otp = cached_values[1]
+        cached_key = cached_values[0]
         if cached_otp == OTP:
-            instance = User.objects.get(email=request.data['email'])
-            update_user_verified_for(instance)
-            return  APIResponse.send(
+            instance = User.objects.get(email=EMAIL)
+            # if instance.exist:
+            update_user_verified_for(instance) #verify user account
+            
+            cache.delete(cached_key)
+            return APIResponse.send(
                 message=f"Account verified successfully.",
                 status=status.HTTP_200_OK,
             )
-        
         return APIResponse.send(
                 message=f"Account verification failed. OTP {OTP} supplied is not matched or expired.",
                 status=status.HTTP_409_CONFLICT,
@@ -318,33 +344,34 @@ class GathpayUserAccountActivate(APIView):
 class GathpayUserResendAccountOTP(APIView):
     permission_classes = []
     
-    def post(request, *args, **kwargs):
-        email = request.data['email']
+    def post(self, request, *args, **kwargs):
+        EMAIL = request.data['email']
         
         try:
-            instance = User.objects.get(email=email)
+            instance = User.objects.get(email=EMAIL)
         except Exception as e:
             logging.debug(e)
             return  APIResponse.send(
-                message=f"Gathpay user account with email {email} not found.",
+                message=f"Gathpay user account with email {EMAIL} not found.",
                 status=status.HTTP_404_NOT_FOUND,
                 error=str(e)
             )
         
         try:
             ''' EXCEUTING THREAD TO SEND EMAIL '''
-            subject = "noreply@Gathpay: Here is your OTP for account activation."
+            
+            subject = "noreply@Gathpay: Here is the OTP for your account verification."
             SendAccountOTP(subject=subject, email=instance.email, user=instance).start()
             
         except SMTPException as e:
             logging.debug(e)
             return  APIResponse.send(
-                message=f"Email verification OTP could not send.",
+                message=f"Failed. Email verification OTP could not resend.",
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 error=str(e)
             )
         
         return  APIResponse.send(
-                message=f"Account verification OTP sent.",
+                message=f"Account verification OTP resent sucessfully.",
                 status=status.HTTP_200_OK,
             )
