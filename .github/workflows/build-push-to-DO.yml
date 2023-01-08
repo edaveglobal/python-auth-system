@@ -11,7 +11,7 @@ on:
 env:
   REGISTRY: registry.digitalocean.com/gathpay-auth
   IMAGE_NAME: gathpay/auth-backend-v1
-  DIGITALOCEAN_ACCESS_TOKEN: dop_v1_0ac7c146fa8e73c0d8cd21e7051ae64b2488c0d778c4742a738669d8c98166e7
+  DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DO_TOKEN }}
 
 #3
 jobs:
@@ -38,7 +38,7 @@ jobs:
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
-          token: dop_v1_0ac7c146fa8e73c0d8cd21e7051ae64b2488c0d778c4742a738669d8c98166e7
+          token: ${{ secrets.DO_TOKEN }}
     
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
         run: doctl registry login --expiry-seconds 600
