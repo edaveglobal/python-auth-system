@@ -6,7 +6,6 @@ djangorestframework
 djangorestframework-simplejwt
 django-utils-six
 django-rest-authemail
-djoser
 django-bmemcached==0.2.4
 gunicorn
 pylint
@@ -14,6 +13,7 @@ psycopg2-binary
 pytest
 pytest-django
 python-dotenv
+python-binary-memcached==0.28.0
 requests
 six
 whitenoise
