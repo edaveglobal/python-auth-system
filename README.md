@@ -6,7 +6,7 @@
 - Clone the repository with ` git clone git@github.com:gathpay/auth-system.git`
 - Navigate to `auth-system` dir and activate virtual environment based on your os using command below
 - Note: If you do not have `development` branch after cloning, then run the command below;
-- Run `git fetch -b origin development`
+- Run `git fetch origin development`
 - Make your feature branch with command ` git checkout -b <your_feature_branch> origin/development` .
 - Run `python3 -m venv venv` Then activate the environment
 - If windows? Run `source venv/Scripts/activate`
