@@ -1,5 +1,6 @@
 ../build-push-notes.md
 ../requirements.dev.txt
 .gitigignore
+../env.example
 LICENSE
 TestsCases/

@@ -1,6 +1,5 @@
 autopep8
 black
-boto3
 Django==4.0
 django-cors-headers
 django-celery-email
