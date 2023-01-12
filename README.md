@@ -12,11 +12,13 @@
 - If windows? Run `source venv/Scripts/activate`
 - If Mac/Linux Run `source venv/bin/activate`.
 - Run `pip install -r ./auth_system/requirements.dev.txt` for installing requirements.
-- Run `python manage.py ./auth_system/migrate` to migrate model to db.
+- Copy everything from `env.example` to `.env` file and edit accordingly.
+- Run `python3  ./auth_system/manage.py makemigrations` and `python  ./auth_system/manage.py migrate` to migrate model to db.
 - Run `pytest` for tests.
 - Lastly, Run `python ./auth_system/manage.py runserver` to spin up server locally.
 
 
 #### Do not hesitate to reach out by creating an issue if there is any problem.
-## Note: Never run the command `pip freeze > requirements.txt` 
+#### Note: Never run the command `pip freeze > requirements.txt`
+
 ### Happy Coding
