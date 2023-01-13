@@ -171,12 +171,13 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-    }
-}
+CACHES = get_cache()
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#         'LOCATION': '127.0.0.1:11211',
+#     }
+# }
 
 
 # Logging Configuration
@@ -231,16 +232,13 @@ EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_HOST_PASSWORD', ''))
 
 def get_cache():
   try:
-    servers = os.environ['MEMCACHIER_SERVERS']
-    username = os.environ['MEMCACHIER_USERNAME']
-    password = os.environ['MEMCACHIER_PASSWORD']
+    servers = os.getenv('MEMCACHIER_SERVERS')
+    username = os.getenv('MEMCACHIER_USERNAME')
+    password = os.getenv('MEMCACHIER_PASSWORD')
     return {
       'default': {
-        'BACKEND': 'django_bmemcached.memcached.BMemcached',
-        # TIMEOUT is not the connection timeout! It's the default expiration
-        # timeout that should be applied to keys! Setting it to `None`
-        # disables expiration.
-        'TIMEOUT': None,
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'TIMEOUT': 60*10,
         'LOCATION': servers,
         'OPTIONS': {
           'username': username,
@@ -251,8 +249,7 @@ def get_cache():
   except:
     return {
       'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
-      }
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211'}
     }
 
-CACHES = get_cache()
