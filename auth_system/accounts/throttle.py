@@ -17,6 +17,11 @@ class AnonRateThreeMinutesThrottle(AnonRateThrottle):
                 tuple:  <allowed number of requests>, <period of time in seconds>
         """
         return (2, 180)
+    
+    # def allow_request(self, request, view):
+    #     if request.method == "GET":
+    #         return True
+    #     return super().allow_request(request, view)
         
         
 
@@ -36,4 +41,9 @@ class UserRateOnePerDayThrottle(UserRateThrottle):
             Returns:
                 tuple:  <allowed number of requests>, <period of time in seconds>
         """
-        return (1, 86400)
+        return (2, 86400)
+    
+    # def allow_request(self, request, view):
+    #     if request.method != "GET" and request.method != "PUT":
+    #         return True
+    #     return super().allow_request(request, view)

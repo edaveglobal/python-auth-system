@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from .thread import SendAccountOTP, SendForgotPasswordOTP
 from .cache import get_cached_otp_for, set_otp_cache_for
 from .models import update_user_verified_for
-from .throttle import AnonRateThreeMinutesThrottle, UserRateOnePerDayThrottle
+# from .throttle import AnonRateThreeMinutesThrottle, UserRateOnePerDayThrottle
 
 from .serializers import (
     GathpayUserAccountRegisterSerializer,
@@ -39,7 +39,7 @@ class APIResponse:
 class GathpayUsersAccount(APIView):
     """ Authorized Specific Users Account View"""
     permission_classes = []
-    throttle_scope = 'register-account'
+    # throttle_scope = 'register-account'
     
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -60,7 +60,7 @@ class GathpayUsersAccount(APIView):
 class GathpayUsersAccounts(APIView):
     """ Authorized Specific Users Accounts View"""
     permission_classes = [IsAuthenticated]
-    throttle_classes = [UserRateOnePerDayThrottle]
+    # throttle_classes = [UserRateOnePerDayThrottle]
     
     def get(self, request, *args, **kwargs):
         try:
@@ -91,7 +91,7 @@ class GathpayUsersAccounts(APIView):
 class GathpayUserAccount(APIView):
     """ Authorized Specific User Account View"""
     permission_classes = [IsAuthenticated]
-    throttle_classes = [UserRateThrottle]
+    # throttle_classes = [UserRateThrottle]
     
     def get(self, request, pk, *args, **kwargs):
         """ Specific User Account Fetch """
@@ -212,7 +212,7 @@ class GathpayUserAccount(APIView):
 class GathpayUserChangePassword(APIView):
     """ This view is actually for an active/logged in user account."""
     permission_classes = [IsAuthenticated]
-    throttle_classes = [UserRateOnePerDayThrottle]
+    # throttle_classes = [UserRateOnePerDayThrottle]
     
     def put(self, request, *args, **kwargs):
         serializer = UpdateUserAccountPasswordSerializer(
@@ -234,7 +234,7 @@ class GathpayUserForgotPassword(APIView):
     """ Unathorized User Forgot Password View """
 
     permission_classes = []
-    throttle_classes = [AnonRateThreeMinutesThrottle]
+    # throttle_classes = [AnonRateThreeMinutesThrottle]
     
     def post(self, request, *args, **kwargs): 
         EMAIL = request.data['email']
@@ -270,7 +270,7 @@ class GathpayUserResetPassword(APIView):
     """ Unauthorized User Account Reset Password View"""
     
     permission_classes = []
-    throttle_classes = [AnonRateThreeMinutesThrottle]
+    # throttle_classes = [AnonRateThreeMinutesThrottle]
     
     def post(self, request, *args, **kwargs):
         
@@ -316,7 +316,7 @@ class GathpayUserAccountVerify(APIView):
     """ Unauthorized User Account Activate View"""
     
     permission_classes = []
-    throttle_classes = [AnonRateThreeMinutesThrottle]
+    # throttle_classes = [AnonRateThreeMinutesThrottle]
     
     def post(self, request, *args, **kwargs):
         OTP = request.data['otp']
@@ -350,7 +350,7 @@ class GathpayUserAccountVerify(APIView):
 class GathpayUserResendAccountOTP(APIView):
     permission_classes = []
     # throttle_scope = 'resend-otp'
-    throttle_classes = [AnonRateThreeMinutesThrottle]
+    # throttle_classes = [AnonRateThreeMinutesThrottle]
     
     def post(self, request, *args, **kwargs):
         EMAIL = request.data['email']

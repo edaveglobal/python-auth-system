@@ -151,16 +151,16 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [],
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-        'rest_framework.throttling.ScopedRateThrottle'
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '5/day',
-        'user': '5/day',
-        'register-account': '2/day'
-    }
+    # 'DEFAULT_THROTTLE_CLASSES': [
+    #     'rest_framework.throttling.AnonRateThrottle',
+    #     'rest_framework.throttling.UserRateThrottle',
+    #     'rest_framework.throttling.ScopedRateThrottle'
+    # ],
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'anon': '5/day',
+    #     'user': '10/day',
+    #     'register-account': '2/day'
+    # }
 }
 
 SIMPLE_JWT = {
@@ -170,15 +170,6 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=60),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
-
-CACHES = get_cache()
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-#         'LOCATION': '127.0.0.1:11211',
-#     }
-# }
-
 
 # Logging Configuration
 logging.basicConfig(level=(logging.DEBUG))
@@ -237,7 +228,7 @@ def get_cache():
     password = os.getenv('MEMCACHIER_PASSWORD')
     return {
       'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django_bmemcached.memcached.BMemcached',
         'TIMEOUT': 60*10,
         'LOCATION': servers,
         'OPTIONS': {
@@ -253,3 +244,4 @@ def get_cache():
         'LOCATION': '127.0.0.1:11211'}
     }
 
+CACHES = get_cache()
