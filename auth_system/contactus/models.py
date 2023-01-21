@@ -32,7 +32,8 @@ def send_admin_message_for(sender, instance, created, **kwargs):
     if created:
         try:
             ''' EXCEUTING THREAD TO SEND CUSTOMER MESSAGE TO GATHPAY ADMIN '''
-            SendCustomerContactUsMessage(subject=instance.subject, email_from=instance.customer_email, message=instance.message).start()
+            SendCustomerContactUsMessage(subject=instance.subject, email_from=instance.customer_email, 
+                message=instance.message, username=instance.customer_name).start()
 
         except Exception as e:
             logging.debug("Failed to execute send customer message thread. " + e)
