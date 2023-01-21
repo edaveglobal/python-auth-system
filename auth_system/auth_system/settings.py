@@ -15,7 +15,7 @@ load_dotenv()
 SECRET_KEY = str(os.getenv('SECRET_KEY', ''))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.getenv('DEBUG', False)) == True
+DEBUG = bool(os.getenv('DEBUG', False))
 
 PROTOCOL = "http"
 DOMAIN = "localhost:3000"
@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'djcelery_email',
-    'accounts'
+    'accounts',
+    'contactus'
 ]
 
 MIDDLEWARE = [
@@ -63,8 +64,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-            os.path.join(BASE_DIR, 'accounts', 'templates', 'accounts')
+            # os.path.join(BASE_DIR, 'templates')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -120,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Lagos'
 
 USE_I18N = True
 
