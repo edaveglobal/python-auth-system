@@ -21,5 +21,10 @@ urlpatterns = [
         'api/v1/',
         include('accounts.urls'), 
         name="accounts"
+        ),
+     path(
+        'api/v1/',
+        include('contactus.urls'), 
+        name="contactus"
         )
 ]

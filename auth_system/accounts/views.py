@@ -42,8 +42,7 @@ class GathpayUsersAccount(APIView):
     # throttle_scope = 'register-account'
     
     def post(self, request, *args, **kwargs):
-        data = request.data
-        serializer = GathpayUserAccountRegisterSerializer(data=data)
+        serializer = GathpayUserAccountRegisterSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
