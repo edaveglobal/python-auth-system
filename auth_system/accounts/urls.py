@@ -44,6 +44,6 @@ urlpatterns = [
         name="resend-otp",
     ),
     path(
-        "/user/account/logout", views.GathpayUserAccountLogOut.as_view(), name="logout"
+        "user/account/logout", views.GathpayUserAccountLogOut.as_view(), name="logout"
     ),
 ]
