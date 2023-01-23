@@ -10,12 +10,11 @@
 #     user_details_url = "/api/v1/users/accounts"
 #     # user infofmation
 #     user_data = {
-#         "email": "test@example.com", 
-#         "username": "test_user", 
+#         "email": "test@example.com",
+#         "username": "test_user",
 #         "password": "verysecret"
 #     }
 #     login_data = {
-#         "email": "test@example.com", 
+#         "email": "test@example.com",
 #         "password": "verysecret"
 #     }
-    

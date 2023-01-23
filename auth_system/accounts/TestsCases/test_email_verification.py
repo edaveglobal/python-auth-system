@@ -11,23 +11,23 @@
 #     user_details_url = "/api/v1/users/accounts"
 #     # user infofmation
 #     user_data = {
-#         "email": "test@example.com", 
-#         "username": "test_user", 
+#         "email": "test@example.com",
+#         "username": "test_user",
 #         "password": "verysecret"
 #     }
 #     login_data = {
-#         "email": "test@example.com", 
+#         "email": "test@example.com",
 #         "password": "verysecret"
 #     }
 
 #     def test_register_with_email_verification(self):
 #         # register the new user
 #         response = self.client.post(self.register_url, self.user_data, format="json")
-#         # expected response 
+#         # expected response
 #         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 #         # expected one email to be send
 #         self.assertEqual(len(mail.outbox), 1)
-        
+
 #         # parse email to get uid and token
 #         email_lines = mail.outbox[0].body.splitlines()
 #         # you can print email to check it
@@ -35,7 +35,7 @@
 #         print(mail.outbox[0].body)
 #         activation_link = [l for l in email_lines if "/activate/" in l][0]
 #         uid, token = activation_link.split("/")[-2:]
-        
+
 #         # verify email
 #         data = {"uid": uid, "token": token}
 #         response = self.client.post(self.activate_url, data, format="json")
@@ -56,11 +56,10 @@
 #         self.assertEqual(response.json()[0]["username"], self.user_data["username"])
 
 
-    
 #     def test_register_resend_verification(self):
 #         # register the new user
 #         response = self.client.post(self.register_url, self.user_data, format="json")
-#         # expected response 
+#         # expected response
 #         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 #         # expected one email to be send
 #         # self.assertEqual(len(mail.outbox), 1)
@@ -82,7 +81,7 @@
 #         data = {"email": self.user_data["email"]}
 #         response = self.client.post(self.resend_verification_url, data, format="json")
 #         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        
+
 #         # there should be two emails in the outbox
 #         self.assertEqual(len(mail.outbox), 2)
 
@@ -90,33 +89,32 @@
 #         email_lines = mail.outbox[1].body.splitlines()
 #         activation_link = [l for l in email_lines if "/activate/" in l][0]
 #         uid, token = activation_link.split("/")[-2:]
-        
+
 #         # verify the email
 #         data = {"uid": uid, "token": token}
 #         response = self.client.post(self.activate_url, data, format="json")
 #         # email verified
 #         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    
 
 #     def test_resend_verification_wrong_email(self):
 #         # register the new user
 #         response = self.client.post(self.register_url, self.user_data, format="json")
-#         # expected response 
+#         # expected response
 #         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
+
 #         # resend the verification email but with WRONG email
 #         data = {"email": self.user_data["email"]+"_this_email_is_wrong"}
 #         response = self.client.post(self.resend_verification_url, data, format="json")
 #         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        
+
 
 #     def test_activate_with_wrong_uid_token(self):
 #         # register the new user
 #         response = self.client.post(self.register_url, self.user_data, format="json")
-#         # expected response 
+#         # expected response
 #         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
+
 #         # verify the email with wrong data
 #         data = {"uid": "wrong-uid", "token": "wrong-token"}
 #         response = self.client.post(self.activate_url, data, format="json")
