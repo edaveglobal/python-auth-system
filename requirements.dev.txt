@@ -1,4 +1,5 @@
 autopep8
+autoflake
 black
 Django==4.0
 django-cors-headers
@@ -9,6 +10,7 @@ djangorestframework-simplejwt
 django-rest-authemail
 flake8
 gunicorn
+isort
 python-memcached==1.59
 pylint
 psycopg2-binary

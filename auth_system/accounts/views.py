@@ -9,6 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken, OutstandingToken, BlacklistedToken
+
 
 
 
@@ -404,7 +406,6 @@ class GathpayUserResendAccountOTP(APIView):
             status=status.HTTP_200_OK,
         )
 
-from rest_framework_simplejwt.tokens import RefreshToken, OutstandingToken, BlacklistedToken
 
 class GathpayUserAccountLogOut(APIView):
 
@@ -415,16 +416,15 @@ class GathpayUserAccountLogOut(APIView):
             tokens = OutstandingToken.objects.filter(user_id=request.user.id)
             for token in tokens:
                 t, _ = BlacklistedToken.objects.get_or_create(token=token)
-            del tokens
             return APIResponse.send(
-                message="You have successfully logged out.",
-                status=status.HTTP_205_RESET_CONTENT
+                message="You have successfully logged out. Log in again when you're back.",
+                status=status.HTTP_200_OK
             )
         except Exception as err:
             logging.debug(err)
             return APIResponse.send(
                 message="Some errors occured.",
-                status=status.HTTP_409_CONFLICT,
+                status=status.HTTP_400_BAD_REQUEST
                 err=str(err)
             )
        
