@@ -424,7 +424,7 @@ class GathpayUserAccountLogOut(APIView):
             logging.debug(err)
             return APIResponse.send(
                 message="Some errors occured.",
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
                 err=str(err)
             )
        
