@@ -417,7 +417,7 @@ class GathpayUserAccountLogOut(APIView):
             for token in tokens:
                 t, _ = BlacklistedToken.objects.get_or_create(token=token)
             return APIResponse.send(
-                message="You have successfully logged out. Log in again when you're back.",
+                message="You have successfully logged out. Log in again to continue transactions.",
                 status=status.HTTP_200_OK
             )
         except Exception as err:
