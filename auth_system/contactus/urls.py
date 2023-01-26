@@ -1,11 +1,11 @@
 from django.urls import path
-from . import views
 
+from . import views
 
 urlpatterns = [
     path(
-        'customers/contact',
+        "customers/contact",
         views.GathpayCustomerContactUs.as_view(),
-        name="customer-contactus")
-    
+        name="customer-contactus",
+    )
 ]

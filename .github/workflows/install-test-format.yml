@@ -58,10 +58,8 @@ jobs:
     # - name: Run tests scripts
     #   run: python3 ./manage.py test
 
-    - name: Auto format py codes
+    - name: Auto format, sort, reomve unused imports from py codes
       run: |
-        autopep8 --in-place --aggressive --aggressive ./*.py  ./accounts/*.py
+        chmod 744 format-py-codes.sh
+        ./format-py-codes.sh
         # flake8 ./auth_system --max-line-length=100
-        # black ./auth_system --check
-        # isort ./auth_system --check --profile black
-        

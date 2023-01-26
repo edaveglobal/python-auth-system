@@ -1,4 +1,6 @@
 autopep8
+autoflake
+black
 Django==4.0
 django-cors-headers
 django-celery-email
@@ -8,6 +10,7 @@ django-utils-six
 django-rest-authemail
 django-bmemcached==0.2.4
 gunicorn
+isort
 pylint
 psycopg2-binary
 pytest
