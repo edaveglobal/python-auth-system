@@ -8,6 +8,7 @@ django-utils-six
 djangorestframework
 djangorestframework-simplejwt
 django-rest-authemail
+django_bmemcached
 flake8
 gunicorn
 isort
