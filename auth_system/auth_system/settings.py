@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "djcelery_email",
     "accounts",
     "contactus",
+    "wallet"
 ]
 
 MIDDLEWARE = [
