@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import GathpayCustomerWalletSerializer, GathpayCustomerReferralDetailSerializer
-from .models import CustomerWallet
+from .models import CustomerWallet, CustomerReferralDetail, CustomerReferreeDetail
 # Create your views here.
 
 
@@ -67,22 +67,60 @@ class GathpayCustomerWallet(APIView):
         )
     
     
-class GathpayCustomerRefrralDetail(APIView):
+class GathpayCustomerReferral(APIView):
     
     permission_classes = []
     
-    def post(self, request, *args, **kwargs):
-        serializer = GathpayCustomerReferralDetailSerializer(data=request.data)
+    def patch(self, request, *args, **kwargs):
+        try:
+            referral_detail_instance = CustomerReferralDetail.objects.get(referrer=request.data["referrer"])
+        except CustomerReferralDetail.DoesNotExist as err:
+            return APIResponse.send(
+                message=f"Failed to fetch {request.data['referrer']} referral details.",
+                status=status.HTTP_404_NOT_FOUND,
+                err=str(err)
+            )
+        
+        serializer = GathpayCustomerReferralDetailSerializer(data=request.data, instance=referral_detail_instance, partial=True)
     
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return APIResponse.send(
-                message="Success. Your referral details have been saved.",
-                status=status.HTTP_201_CREATED
+                message=f"Success. {request.data['referrer']} referral details have been updated.",
+                status=status.HTTP_201_CREATED,
+                data=serializer.data
             )
         logging.debug(serializer.error)
+        returnlatest_referree
+        
+class GathpayCustomerReferralDetails(APIView):
+    
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        try:
+            referral_detail_instance = CustomerReferralDetail.objects.filter(referrer=request.user.username)
+        except CustomerReferralDetail.DoesNotExist as e:
+            logging.debug(f"Failed to fetch referrer with the supplied username." + e)
+            return APIResponse.send(
+                message="Failed. Maybe you are not supplying customer username or no referral details for this customer.",
+                status=status.HTTP_404_NOT_FOUND,
+                err=str(e)
+            )
+        
+        serializer = GathpayCustomerReferralDetailSerializer
+        
+        if serializer.is_valid:
+            data = serializer(referral_detail_instance, many=True).data
+            return APIResponse.send(
+                message=f"Success. {request.user.username} referral details fetched.",
+                status=status.HTTP_200_OK,
+                data=data 
+            )
+            
+        logging.debug(serializer.error)
         return APIResponse.send(
-                message="Failed. Encountered some errors.",
+                message=f"Error. Serialized data is not valid.",
                 status=status.HTTP_400_BAD_REQUEST,
                 err=str(serializer.error)
             )

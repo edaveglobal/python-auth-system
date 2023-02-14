@@ -10,7 +10,12 @@ urlpatterns = [
     ),
     path(
         "customer/wallet/referral",
-        views.GathpayCustomerRefrralDetail.as_view(),
+        views.GathpayCustomerReferral.as_view(),
+        name="customer-referral-detail",
+    ),
+    path(
+        "customer/wallet/referral/details",
+        views.GathpayCustomerReferralDetails.as_view(),
         name="customer-referral-detail",
     )
 ]
