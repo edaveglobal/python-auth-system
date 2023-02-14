@@ -1,8 +1,10 @@
+import os
+
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.fields import CurrentUserDefault
 
-from .models import CustomerWallet, CustomerReferralDetail
+from .models import CustomerWallet, CustomerReferralDetail, CustomerReferreeDetail
 
 
 
@@ -39,18 +41,12 @@ class GathpayCustomerReferralDetailSerializer(serializers.ModelSerializer):
         model = CustomerReferralDetail
         fields = "__all__"
         
-    # def save(self, validated_data, *args):
-    #     referrer = CurrentUserDefault()
-    #     referree_username=self.validated_data["referree_username"]
-        # referral_detail_instance = CustomerReferralDetail.objects.create(
-        #     referrer=referrer,
-        #     referree_username=validated_data["referree_username"],
-            
-        # )
-
-        # referral_detail_instance.save()
-        # return referral_detail_instance
-
+    def update(self, instance, validated_data):
+        instance.latest_referree = validated_data["latest_referree"]
+        instance.referrals += int(os.getenv("REFERRAL_VALUE"))
+        instance.referral_bonus +=  int(os.getenv("REFERRAL_BONUS")) #subject to change later
+        instance.save()
+        return instance
 
 
 

@@ -43,11 +43,11 @@ class GathpayUsersAccount(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return APIResponse.send(
-                message=f"Gathpay user {data['first_name']} account is successfully registered. Kindly check your mail for OTP.",
+                message=f"Gathpay user {request.data['username']} account is successfully registered. Kindly check your mail for OTP.",
                 status=status.HTTP_201_CREATED,
             )
         return APIResponse.send(
-            message=f"User with first name {data['first_name']} failed to register.",
+            message=f"User with first name {request.data['username']} failed to register.",
             status=status.HTTP_400_BAD_REQUEST,
         )
 
