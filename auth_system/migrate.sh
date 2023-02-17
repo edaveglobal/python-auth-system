@@ -1,5 +1,4 @@
 #!/bin/bash
-#!/bin/bash
 SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL:-"gathpay@gmail.com"}
 cd /app/
 
