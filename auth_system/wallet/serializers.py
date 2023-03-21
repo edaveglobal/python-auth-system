@@ -49,4 +49,16 @@ class GathpayCustomerReferralDetailSerializer(serializers.ModelSerializer):
         return instance
 
 
+class GathpayCustomerReferreeDetailsSerializer(serializers.ModelSerializer):
+    referrer = serializers.SerializerMethodField()
+    
+    def get_referrer(self, obj):
+        return obj.referrer.referrer
+    
+    
+    class Meta:
+        model = CustomerReferreeDetail
+        fields = "__all__"
+        
+
 

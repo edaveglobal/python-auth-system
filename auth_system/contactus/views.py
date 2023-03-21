@@ -25,5 +25,5 @@ class GathpayCustomerContactUs(APIView):
         return APIResponse.send(
             message="Failed. Some errors occured.",
             status=status.HTTP_400_BAD_REQUEST,
-            err=string(serializer.error),
+            err=str(serializer.error),
         )

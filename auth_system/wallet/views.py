@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import GathpayCustomerWalletSerializer, GathpayCustomerReferralDetailSerializer
+from .serializers import GathpayCustomerWalletSerializer, GathpayCustomerReferralDetailSerializer, GathpayCustomerReferreeDetailsSerializer
 from .models import CustomerWallet, CustomerReferralDetail, CustomerReferreeDetail
 # Create your views here.
 
@@ -16,6 +16,7 @@ class APIResponse:
 
 
 class GathpayCustomerWallet(APIView):
+    """ GET and PATCH authorized requests on customer wallet """
     
     permission_classes = [IsAuthenticated]
     
@@ -48,7 +49,7 @@ class GathpayCustomerWallet(APIView):
             wallet = CustomerWallet.objects.get(customer=request.user)
         except Exception as err:
             return APIResponse.send(
-                message=f"Failed to fetch {request.user} wallet.",
+                message=f"Failed to fetch {request.user} wallet details.",
                 status=status.HTTP_404_NOT_FOUND,
                 err=str(err)
             )
@@ -57,7 +58,7 @@ class GathpayCustomerWallet(APIView):
             serializer.save()
             return APIResponse.send(
                 message=f"Success. Customer {request.user} wallet details updated.",
-                status=status.HTTP_200_OK,
+                status=status.HTTP_201_CREATED,
                 data=serializer.data
             )
         return APIResponse.send(
@@ -68,6 +69,7 @@ class GathpayCustomerWallet(APIView):
     
     
 class GathpayCustomerReferral(APIView):
+    """ PATCH unauthorized request on customer referral details """
     
     permission_classes = []
     
@@ -92,18 +94,20 @@ class GathpayCustomerReferral(APIView):
             )
         logging.debug(serializer.error)
         returnlatest_referree
-        
+    
+
 class GathpayCustomerReferralDetails(APIView):
+    """ GET authorized requests on customer referral details """
     
     permission_classes = [IsAuthenticated]
     
     def get(self, request, *args, **kwargs):
         try:
-            referral_detail_instance = CustomerReferralDetail.objects.filter(referrer=request.user.username)
+            referral_details_instance = CustomerReferralDetail.objects.filter(referrer=request.user.username)
         except CustomerReferralDetail.DoesNotExist as e:
-            logging.debug(f"Failed to fetch referrer with the supplied username." + e)
+            logging.debug(f"Failed to fetch referrer for this request user." + e)
             return APIResponse.send(
-                message="Failed. Maybe you are not supplying customer username or no referral details for this customer.",
+                message=f"Failed. No referral detail for the customer {request.user.username}.",
                 status=status.HTTP_404_NOT_FOUND,
                 err=str(e)
             )
@@ -111,9 +115,41 @@ class GathpayCustomerReferralDetails(APIView):
         serializer = GathpayCustomerReferralDetailSerializer
         
         if serializer.is_valid:
-            data = serializer(referral_detail_instance, many=True).data
+            data = serializer(referral_details_instance, many=True).data
             return APIResponse.send(
-                message=f"Success. {request.user.username} referral details fetched.",
+                message=f"Success. {request.user.username} referral details have been fetched.",
+                status=status.HTTP_200_OK,
+                data=data 
+            )
+            
+        logging.debug(serializer.error)
+        return APIResponse.send(
+                message=f"Error. Serialized data is not valid.",
+                status=status.HTTP_400_BAD_REQUEST,
+                err=str(serializer.error)
+            )
+class GathpayCustomerReferreeDetails(APIView):
+    """ GET authorized requests on customer referree details """
+     
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        try:
+            referree_details_instance = CustomerReferreeDetail.objects.filter(referrer__referrer=request.user.username)
+        except CustomerReferreeDetail.DoesNotExist as e:
+            logging.debug(f"Failed to fetch referrer's referree details for this request user." + e)
+            return APIResponse.send(
+                message=f"Failed. No referree detail(s) for the customer {request.user.username}.",
+                status=status.HTTP_404_NOT_FOUND,
+                err=str(e)
+            )
+        
+        serializer = GathpayCustomerReferreeDetailsSerializer
+        
+        if serializer.is_valid:
+            data = serializer(referree_details_instance, many=True).data
+            return APIResponse.send(
+                message=f"Success. {request.user.username} referree details have been fetched.",
                 status=status.HTTP_200_OK,
                 data=data 
             )

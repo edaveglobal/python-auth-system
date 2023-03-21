@@ -16,6 +16,11 @@ urlpatterns = [
     path(
         "customer/wallet/referral/details",
         views.GathpayCustomerReferralDetails.as_view(),
-        name="customer-referral-detail",
+        name="customer-referral-details",
+    ),
+    path(
+        "customer/wallet/referree/details",
+        views.GathpayCustomerReferreeDetails.as_view(),
+        name="customer-referree-details",
     )
 ]

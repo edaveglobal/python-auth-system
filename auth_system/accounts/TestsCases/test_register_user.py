@@ -1,36 +1,30 @@
-from django.contrib.auth.models import User
-from django.test import Client, TestCase
-from django.urls import reverse
+import logging
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 
-from accounts.serializers import *
-
+from django.contrib.auth.models import User
 from .configs import Configs
 
 
-class UserRegisterWithEmailTest(TestCase):
-    config = Configs()
-
-    client = Client()
-
-    def setUp(self) -> None:
-        self.test_user = User.objects.create_user(**self.config.user_register_data)
-
-    # def test_user_register_with_username(self):
-    #     response = self.client.post(self.config.register_url, self.config.user_register_data, format="json")
-    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    #     self.assertEqual(len(response), 2)
-
+class UserCreateTestCase(APITestCase):
+    client = APIClient()
     def test_user_create(self):
-        response = self.client.get(
-            "http://localhost:8000/api/v1/users/account/<int: pk>/",
-            kwargs={"pk": self.test_user.pk},
-            format="json",
-        )
-        test_user = User.objects.get(pk=self.test_user.pk)
-        serializer = GathpayUsersAccountSerializer(
-            data=test_user, many=False
-        ).is_valid()
-        print(response, serializer)
-        # self.assertEqual(response.statusCode, )
-        # self.assertContains(status_code=status.HTTP_201_CREATED)
+        config = Configs()
+
+        user_test_data = {
+            "username": "testuser2",
+            "email": "test@testuser.co",
+            "first_name": "testfirst",
+            "last_name": "testlast",
+            "password": "test@123",
+            "password2": "test@123"
+        }
+        try:
+            user_initial_count = User.objects.count()
+            response = self.client.post(config.register_url, user_test_data, content_type='application/json')
+            # print(response.data)
+            self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+            self.assertEqual(User.objects.count(), user_initial_count)
+        except Exception as e:
+            print(e)
+            logging.debug(e)

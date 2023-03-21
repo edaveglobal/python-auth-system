@@ -1,4 +1,5 @@
 import logging
+import os
 import secrets
 from smtplib import SMTPException
 
@@ -8,6 +9,10 @@ from auth_system.settings import EMAIL_HOST_USER
 
 
 def send_account_otp(email, user, subject):
+    # for tests not to send email
+    if os.getenv('DEBUG'):
+        return
+    
     otp = secrets.choice(range(1000, 10000))
     message = f"Hi {user.username},\n\nYour account one-time-password is {otp}.\
         \nThis one-time-password will expire in the next 10 minutes.\

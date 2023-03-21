@@ -6,12 +6,12 @@ urlpatterns = [
     path(
         "users/account",
         views.GathpayUsersAccount.as_view(),
-        name="register-useraccount",
+        name="register-customer",
     ),
     path(
         "users/accounts/",
         views.GathpayUsersAccounts.as_view(),
-        name="get-usersaccounts",
+        name="get-customers",
     ),
     path(
         "users/<int:pk>/account/",

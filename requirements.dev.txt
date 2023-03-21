@@ -18,6 +18,7 @@ psycopg2-binary
 pytest
 pytest-django
 python-dotenv
+pytest-benchmark
 requests
 six
 whitenoise
