@@ -38,9 +38,11 @@ class GathpayUsersAccount(APIView):
     # throttle_scope = 'register-account'
 
     def post(self, request, *args, **kwargs):
+        print("I got here")
         serializer = GathpayUserAccountRegisterSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
+            print("I am being called")
             serializer.save()
             return APIResponse.send(
                 message=f"Gathpay user {request.data['username']} account is successfully registered. Kindly check your mail for OTP.",

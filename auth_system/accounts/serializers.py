@@ -12,7 +12,7 @@ class GathpayUserAccountRegisterSerializer(serializers.ModelSerializer):
     )
 
     username = serializers.CharField(
-        required=False, validators=[UniqueValidator(queryset=User.objects.all())]
+        required=True, validators=[UniqueValidator(queryset=User.objects.all())]
     )
 
     password = serializers.CharField(
@@ -32,7 +32,7 @@ class GathpayUserAccountRegisterSerializer(serializers.ModelSerializer):
             "password2",
             "is_superuser",
             "is_active",
-            "date_joined",
+            "date_joined"
         )
         extra_kwargs = {
             "first_name": {"required": True},
@@ -53,7 +53,7 @@ class GathpayUserAccountRegisterSerializer(serializers.ModelSerializer):
             username=validated_data["username"],
             email=validated_data["email"],
             first_name=validated_data["first_name"].capitalize(),
-            last_name=validated_data["last_name"].capitalize(),
+            last_name=validated_data["last_name"].capitalize()
         )
 
         user.set_password(validated_data["password"])
